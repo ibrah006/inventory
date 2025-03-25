@@ -1,3 +1,5 @@
+import 'package:fluent_ui/fluent_ui.dart';
+
 extension ListReplaceFirstWhere<T> on List<T> {
   // Replace the first element that satisfies the condition
   void replaceFirstWhere(bool Function(T) test, T Function(T) replace) {
@@ -21,11 +23,19 @@ extension StringAddSpaceBetweenCaps on String {
 }
 
 extension StringIsValidDate on String {
-  bool isValidDate() {
+  bool isValidDate({bool showDebugPrint = false}) {
+    if (showDebugPrint) {
+      debugPrint("(debug) (extension) String.isValidDate field value: $this");
+    }
+
     // Basic regex to check DD/MM/YYYY format
     final regex = RegExp(r"^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$");
 
     if (!regex.hasMatch(this)) {
+      if (showDebugPrint) {
+        debugPrint(
+            "(debug) (extension) String.isValidDate, regex.hasMatch == false -> returns false out of he function");
+      }
       return false; // If the format doesn't match
     }
 
@@ -37,6 +47,10 @@ extension StringIsValidDate on String {
 
     // Check for valid days per month (accounting for leap years)
     if (!_isValidDay(day, month, year)) {
+      if (showDebugPrint) {
+        debugPrint(
+            "(debug) (extension) String.isValidDate, _isValidDay(...) == false");
+      }
       return false;
     }
 

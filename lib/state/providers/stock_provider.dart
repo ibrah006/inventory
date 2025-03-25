@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:inventory/database/invoice.dart';
-import 'package:inventory/database/invoice_item.dart';
+import 'package:inventory/database/invoice/invoice.dart';
+import 'package:inventory/database/invoice/invoice_item.dart';
 import 'package:inventory/database/item.dart';
 
 class StockProvider extends ChangeNotifier {
@@ -31,6 +31,5 @@ class StockProvider extends ChangeNotifier {
 
   void intializeStock(List<Item> items) {
     _stock = items;
-    notifyListeners();
   }
 }

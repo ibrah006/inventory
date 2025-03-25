@@ -1,6 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:inventory/constants.dart';
+import 'package:inventory/database/invoice/invoice_item.dart';
+import 'package:inventory/database/invoice/purchase_invoice.dart';
+import 'package:inventory/database/invoice/sales_invoice.dart';
 import 'package:inventory/state/providers/stock_provider.dart';
 import 'package:inventory/tables/row_info/stock_info.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +56,7 @@ class _StockTableState extends State<StockTable> {
   Widget build(BuildContext context) {
     calculateUpdateStockTotals();
 
-    inventoryData = Provider.of<StockProvider>(context, listen: false)
+    inventoryData = Provider.of<StockProvider>(context)
         .getStock()
         .map<StockInfo>((stockItem) {
       return StockInfo(
@@ -255,6 +258,26 @@ class _StockTableState extends State<StockTable> {
     );
   }
 
+  gotoInvoiceScreen({required bool isPurchase, required StockInfo data}) {
+    final List<InvoiceItem> invoiceInitialItems = [
+      InvoiceItem(
+          itemDesc: data.name,
+          quantity: 1,
+          amount: data.amount,
+          cost: data.amount)
+    ];
+
+    Navigator.pushNamed(
+        context, "inventory/invoice/${isPurchase ? "purchase" : "sales"}",
+        arguments: isPurchase
+            ? PurchaseInvoice(
+                invoiceInitialItems: invoiceInitialItems,
+                initialItemDesc: data.name)
+            : SalesInvoice(
+                invoiceInitialItems: invoiceInitialItems,
+                initialItemDesc: data.name));
+  }
+
   List<TableRow> _buildInventoryTableRows() {
     // Example rows, replace with dynamic data
 
@@ -291,9 +314,17 @@ class _StockTableState extends State<StockTable> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Button(child: Icon(PURCHASE_ICON), onPressed: () {}),
+                Button(
+                    child: Icon(PURCHASE_ICON),
+                    onPressed: () {
+                      gotoInvoiceScreen(isPurchase: true, data: data);
+                    }),
                 SizedBox(width: 4),
-                Button(child: Icon(SALES_ICON), onPressed: () {})
+                Button(
+                    child: Icon(SALES_ICON),
+                    onPressed: () {
+                      gotoInvoiceScreen(isPurchase: false, data: data);
+                    })
               ],
             ),
           )

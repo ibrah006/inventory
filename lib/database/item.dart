@@ -1,4 +1,4 @@
-import 'package:inventory/database/vendor.dart';
+import 'package:inventory/database/parties/vendor.dart';
 import 'package:inventory/database/person.dart';
 import 'package:inventory/database/units.dart';
 

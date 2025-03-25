@@ -125,7 +125,8 @@ class _AddInventoryState extends State<AddInventoryScreen> {
                     label: "Purchase",
                     icon: FluentIcons.shopping_cart,
                     onPressed: () {
-                      Navigator.pushNamed(context, "inventory/invoice");
+                      Navigator.pushNamed(
+                          context, "inventory/invoice/purchase");
                     }),
                 SizedBox(width: 10),
                 _buildNavigationButton(

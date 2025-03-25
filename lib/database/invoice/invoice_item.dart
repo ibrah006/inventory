@@ -56,6 +56,15 @@ class InvoiceItem {
         amount: double.parse(rowInfo.rowCells[3]));
   }
 
+  RowInfo toRowInfo() {
+    return RowInfo(rowCells: [
+      itemDesc,
+      quantity.toString(),
+      cost.toStringAsFixed(2),
+      amount.toStringAsFixed(2)
+    ]);
+  }
+
   /// Functionality when a new id has been chosen from the Auto Suggest Box
   void onNewIdSelected(Item stockItem) {
     itemDesc = stockItem.id;

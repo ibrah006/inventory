@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:inventory/database/invoice.dart';
+import 'package:inventory/database/invoice/invoice.dart';
 
 class Dialogs {
   static final Map<InvoiceValidationFeedback, String>
@@ -11,7 +11,12 @@ class Dialogs {
     InvoiceValidationFeedback.invalidIssueDate:
         "Invlaid Issue date: Please provide date in valid DD/MM/YYYY format.",
     InvoiceValidationFeedback.invalidVendor:
-        "Invalid Vendor: Vendor cannot be empty."
+        "Invalid Vendor: Please provide a valid vendor with name and id.",
+    //TODO: URGENT add delivery invalid feedbacks
+    InvoiceValidationFeedback.invalidDeliveryDueDate:
+        "Invalid Delivery Due date: Please provide date in valid DD/MM/YYYY format.",
+    InvoiceValidationFeedback.invalidDeliveryStatus:
+        "Invalid Status: Status field cannot be empty.",
   };
 
   static Future<String?> showZeroTotalInvoiceWarning(BuildContext context) {
@@ -26,6 +31,15 @@ class Dialogs {
         ),
         negativeButton: "Cancel",
         positiveButton: "Yes");
+  }
+
+  static Future<String?> showSuccessfullyAddInvoice(BuildContext context) {
+    return _showDialog(context,
+        title: "Invoice Entry Added",
+        body: Text(
+            "The Invoice entry has been successfully added.\n\n\nGo back or add another invoice entry?"),
+        negativeButton: "Go back",
+        positiveButton: "Add another");
   }
 
   static Future<String?> showInvoiceErrors(BuildContext context,
@@ -84,30 +98,42 @@ class Dialogs {
 
   static Future<String?> vendorNotFoundDialog(BuildContext context,
       {required String vendor}) async {
-    final result = await _showDialog(context,
-        title: "Vendor not found",
-        positiveButton: "Add",
-        negativeButton: "Cancel",
-        body: RichText(
-            text: TextSpan(
-          children: <TextSpan>[
-            TextSpan(
-              text: 'Do you want to add vendor ',
-              style: TextStyle(fontSize: 14, color: Colors.black),
-            ),
-            TextSpan(
-              text: '$vendor',
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
-            ),
-            TextSpan(
-              text: ' into the database?',
-              style: TextStyle(fontSize: 14, color: Colors.black),
-            ),
-          ],
-        )));
+    final result = await _showDialog(
+      context,
+      title: "Vendor not found",
+      positiveButton: "Proceed",
+      negativeButton: "Cancel",
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          RichText(
+              text: TextSpan(
+            children: <TextSpan>[
+              TextSpan(
+                text: 'Do you want to add vendor ',
+                style: TextStyle(fontSize: 14, color: Colors.black),
+              ),
+              TextSpan(
+                text: '$vendor',
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
+              TextSpan(
+                text: ' into the database?',
+                style: TextStyle(fontSize: 14, color: Colors.black),
+              ),
+            ],
+          )),
+          SizedBox(height: 35),
+          Text(
+              "By proceeding, you will be promted with a text input to give an ID for the vendor.",
+              style: FluentTheme.of(context).typography.caption!.copyWith(
+                  color: Colors.grey[130], fontWeight: FontWeight.w500))
+        ],
+      ),
+    );
 
     return result;
   }

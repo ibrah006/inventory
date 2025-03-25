@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:inventory/database/item.dart';
 import 'package:inventory/database/person.dart';
 import 'package:inventory/database/units.dart';
-import 'package:inventory/database/vendor.dart';
+import 'package:inventory/database/parties/vendor.dart';
 
 class Samples {
   static List<Item> generate() {
@@ -33,9 +33,9 @@ class Samples {
     ];
 
     List<Vendor> sampleVendors = [
-      Vendor(name: "Vendor A"),
-      Vendor(name: "Vendor B"),
-      Vendor(name: "Vendor C"),
+      Vendor.create(name: "Vendor A", id: "VENDOR-001"),
+      Vendor.create(name: "Vendor B", id: "VENDOR-002"),
+      Vendor.create(name: "Vendor C", id: "VENDOR-003"),
     ];
 
     Person samplePerson = Person(name: "John Doe");

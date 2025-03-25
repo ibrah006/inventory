@@ -1,11 +1,13 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:inventory/database/invoice/purchase_invoice.dart';
+import 'package:inventory/database/invoice/sales_invoice.dart';
 import 'package:inventory/state/providers/groups_provider.dart';
 import 'package:inventory/state/providers/stock_provider.dart';
 import 'package:inventory/screens/add_inventory/add_inventory.dart';
 import 'package:inventory/screens/home_screen.dart';
 import 'package:inventory/screens/add_inventory/unit_measure_screen.dart';
 import 'package:inventory/screens/invoice_screen.dart';
-import 'package:inventory/state/providers/vendors_provider.dart';
+import 'package:inventory/state/providers/parties/vendors_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -34,7 +36,9 @@ class MyApp extends StatelessWidget {
           "home": (context) => HomeScreen(),
           "inventory/add": (context) => AddInventoryScreen(),
           "inventory/add/units": (context) => UnitMeasureScreen(),
-          "inventory/invoice": (context) => InvoiceScreen()
+          "inventory/invoice/purchase": (context) =>
+              InvoiceScreen(PurchaseInvoice()),
+          "inventory/invoice/sales": (context) => InvoiceScreen(SalesInvoice()),
         },
       ),
     );
