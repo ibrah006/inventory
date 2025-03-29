@@ -225,6 +225,8 @@ class Invoice {
       validations.add(InvoiceValidationFeedback.invalidInvoiceNumber);
     }
 
+    print("party name: ${party.name}, id: ${party.id}");
+
     // Validate vendor. Do not need to check if the vendor actually exists becuase the vendor field will not take in a vendor that doesn't exist
     if (party.name.trim().isEmpty || party.id.trim().isEmpty) {
       validations.add(InvoiceValidationFeedback.invalidVendor);

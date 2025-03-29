@@ -394,6 +394,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                             value: parties[index].id,
                                             label: parties[index].name);
                                       }),
+                                      onSelected: (newValue) {
+                                        final String partyId = newValue.value!;
+                                        invoice.party.id = partyId;
+                                      },
                                       onOverlayVisibilityChanged:
                                           (focussed) async {
                                         if (!focussed) {
@@ -817,9 +821,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       // invoice.vendor = Vendor(context, id: );
     } else {
       invoice.party.id = "";
+      // Show Vendor not found dialog and give option to CREATE this vendor
       final action = await Dialogs.vendorNotFoundDialog(context,
           vendor: vendorName, isVendor: invoice.isPurchaseInvoice);
 
+      /// VENDOR CREATION - proceed: create vendor with inputted vendor id from field or cancel: DONT CREATE VENDOR
       /// action can be "cancel" or "proceed"
       if (action == "proceed") {
         // vendorsProvider.add(Vendor.create(id: , name: vendorName));
