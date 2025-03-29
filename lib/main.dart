@@ -1,8 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:inventory/config/routes.dart';
-import 'package:inventory/features/customer/presentation/providers/customer_provider.dart';
-import 'package:inventory/features/inventory/presentation/providers/stock_provider.dart';
-import 'package:inventory/features/vendor/presentation/providers/vendors_provider.dart';
+import 'package:inventory/core/providers/customer_provider.dart';
+import 'package:inventory/core/providers/stock_provider.dart';
+import 'package:inventory/core/providers/vendors_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {

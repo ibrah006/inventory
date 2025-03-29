@@ -1,14 +1,14 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:inventory/features/inventory/data/item.dart';
-import 'package:inventory/features/invoice/data/invoice.dart';
+import 'package:inventory/core/models/stock.dart';
+import 'package:inventory/core/models/invoice.dart';
 import 'package:inventory/features/invoice/data/invoice_item.dart';
 
 class StockProvider extends ChangeNotifier {
-  List<Item> _stock = [];
+  List<Stock> _stock = [];
 
-  List<Item> getStock() => _stock;
+  List<Stock> getStock() => _stock;
 
-  void add(Item item) {
+  void add(Stock item) {
     _stock.add(item);
     notifyListeners();
   }
@@ -18,7 +18,8 @@ class StockProvider extends ChangeNotifier {
     // TODO: (not urgent but) implement a better algorithm
     for (InvoiceItem invoiceItem in invoice.items) {
       _stock.firstWhere((stockItem) =>
-          "${stockItem.id} ${stockItem.desc}" == invoiceItem.itemDesc)
+          "${stockItem.product.id} ${stockItem.product.desc}" ==
+          invoiceItem.itemDesc)
         ..stockQuantity += (invoice.isPurchaseInvoice
             ? invoiceItem.quantity
             : -invoiceItem.quantity)
@@ -29,7 +30,7 @@ class StockProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void intializeStock(List<Item> items) {
+  void intializeStock(List<Stock> items) {
     _stock = items;
   }
 }

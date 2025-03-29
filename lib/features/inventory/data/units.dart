@@ -4,8 +4,9 @@ class Units<T> extends UnitProvider<T> {
   bool isBuyingUnits;
 
   factory Units.fromUnitsProvider(UnitProvider unitProvider,
-      {required bool isBuyingUnits}) {
+      {required bool isBuyingUnits, String unit = ""}) {
     return Units(isBuyingUnits: isBuyingUnits)
+      ..unit = unit
       ..isSameAsStockingUnit = unitProvider.isSameAsStockingUnit
       ..unitController.text = unitProvider.unitController.text
       ..relationshipBy = unitProvider.relationshipBy;
@@ -16,7 +17,18 @@ class Units<T> extends UnitProvider<T> {
 
   Units({required this.isBuyingUnits});
 
-  Map<String, dynamic> toMap() {
+  // Factory constructor to create a Units object from a JSON map
+  factory Units.fromJson(Map<String, dynamic> json) {
+    final units = Units<T>(isBuyingUnits: json['isBuyingUnits'] ?? false)
+      ..isSameAsStockingUnit = json['isSameAsStockingUnit'] ?? false
+      ..unitController.text = json['unit'] ?? ""
+      ..relationshipController.text = json['relationship'] ?? ""
+      ..relationshipBy = json['relationBy'];
+
+    return units;
+  }
+
+  Map<String, dynamic> toJson() {
     return {
       "isBuyingUnits": isBuyingUnits,
       "isSameAsStockingUnit": isSameAsStockingUnit,

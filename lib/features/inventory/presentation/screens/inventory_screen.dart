@@ -2,8 +2,8 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:inventory/config/routes.dart';
 import 'package:inventory/core/constants/in_out_icons.dart';
 import 'package:inventory/features/inventory/data/samples.dart';
-import 'package:inventory/features/inventory/presentation/providers/stock_provider.dart';
-import 'package:inventory/features/vendor/presentation/providers/vendors_provider.dart';
+import 'package:inventory/core/providers/stock_provider.dart';
+import 'package:inventory/core/providers/vendors_provider.dart';
 import 'package:inventory/presentation/widgets/tables/stock_table.dart';
 import 'package:provider/provider.dart';
 
@@ -19,12 +19,12 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
     // Navigator.pushNamed(context, "inventory/add/units");
   }
 
-  Divider get _divider => Divider(
-        style: DividerThemeData(
-            decoration: BoxDecoration(
-          color: Colors.grey[150],
-        )),
-      );
+  // Divider get _divider => Divider(
+  //       style: DividerThemeData(
+  //           decoration: BoxDecoration(
+  //         color: Colors.grey[150],
+  //       )),
+  //     );
 
   @override
   Widget build(BuildContext context) {
@@ -251,47 +251,48 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
     );
   }
 
-  Widget _buildNavItem(
-      {required IconData icon,
-      required String label,
-      required int index,
-      bool hasIndicator = false,
-      isExpandable = false}) {
-    final bool isSelected = 1 == index;
+  // Widget _buildNavItem(
+  //     {required IconData icon,
+  //     required String label,
+  //     required int index,
+  //     bool hasIndicator = false,
+  //     isExpandable = false
+  //     }) {
+  //   final bool isSelected = 1 == index;
 
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          // selectedIndex = index;
-        });
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.blue.withOpacity(.2) : Colors.transparent,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Row(
-          children: [
-            if (hasIndicator)
-              Icon(FluentIcons.home,
-                  color: Colors.magenta.withAlpha(180), size: 18)
-            else
-              Icon(icon, color: Colors.grey[160], size: 18),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                  color: Colors.grey[210], fontWeight: FontWeight.w500
-                  // fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //   return GestureDetector(
+  //     onTap: () {
+  //       setState(() {
+  //         // selectedIndex = index;
+  //       });
+  //     },
+  //     child: Container(
+  //       margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+  //       padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
+  //       decoration: BoxDecoration(
+  //         color: isSelected ? Colors.blue.withOpacity(.2) : Colors.transparent,
+  //         borderRadius: BorderRadius.circular(4),
+  //       ),
+  //       child: Row(
+  //         children: [
+  //           if (hasIndicator)
+  //             Icon(FluentIcons.home,
+  //                 color: Colors.magenta.withAlpha(180), size: 18)
+  //           else
+  //             Icon(icon, color: Colors.grey[160], size: 18),
+  //           const SizedBox(width: 12),
+  //           Text(
+  //             label,
+  //             style: TextStyle(
+  //                 color: Colors.grey[210], fontWeight: FontWeight.w500
+  //                 // fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+  //                 ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   void initState() {

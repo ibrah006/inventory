@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:inventory/features/inventory/data/item.dart';
-import 'package:inventory/features/inventory/presentation/providers/stock_provider.dart';
+import 'package:inventory/core/models/product.dart';
+import 'package:inventory/core/providers/stock_provider.dart';
 import 'package:inventory/presentation/widgets/tables/row_info/row_info_regular.dart';
 import 'package:provider/provider.dart';
 
@@ -66,14 +66,14 @@ class InvoiceItem {
   }
 
   /// Functionality when a new id has been chosen from the Auto Suggest Box
-  void onNewIdSelected(Item stockItem) {
+  void onNewIdSelected(Product stockItem) {
     itemDesc = stockItem.id;
 
     // TODO: if this is a sales invoice, then check if there is at least one unit item in stock otherwise throw error
 
     quantity = 1;
-    cost = stockItem.unitPrice;
-    amount = (stockItem.unitPrice * quantity);
+    cost = stockItem.unitPrice ?? 0;
+    amount = ((stockItem.unitPrice ?? 0) * quantity);
   }
 
   final TextEditingController itemDescController = TextEditingController(),
@@ -94,8 +94,9 @@ class InvoiceItem {
         print("item id from canValidateFields: ${itemDesc}");
         Provider.of<StockProvider>(context, listen: false)
             .getStock()
-            .firstWhere(
-                (stockItem) => "${stockItem.id} ${stockItem.desc}" == itemDesc);
+            .firstWhere((stockItem) =>
+                "${stockItem.product.id} ${stockItem.product.desc}" ==
+                itemDesc);
       } on StateError {
         return AddInvoiceItemFeedback.itemError;
       }

@@ -1,13 +1,14 @@
 import 'dart:math';
 
+import 'package:inventory/core/models/stock.dart';
 import 'package:inventory/data/models/person.dart';
-import 'package:inventory/features/inventory/data/item.dart';
+import 'package:inventory/core/models/product.dart';
 import 'package:inventory/features/inventory/data/units.dart';
-import 'package:inventory/features/vendor/data/vendor.dart';
+import 'package:inventory/core/models/vendor.dart';
 
 class Samples {
-  static List<Item> generate() {
-    List<Item> items = [];
+  static List<Stock> generate() {
+    List<Stock> items = [];
     Random random = Random();
     List<String> itemDescriptions = [
       "Laptop",
@@ -44,12 +45,11 @@ class Samples {
 
     for (int i = 0; i < 20; i++) {
       String id = "item_${i + 1}";
-      String groupId = "group_${random.nextInt(5) + 1}";
       String desc = itemDescriptions[random.nextInt(itemDescriptions.length)];
       List<Vendor> vendors = [
         sampleVendors[random.nextInt(sampleVendors.length)]
       ]; // Random vendor
-      int inOrder = random.nextInt(100);
+      // int inOrder = random.nextInt(100);
       int stockQuantity = random.nextInt(50);
       DateTime? lastCheckDate =
           DateTime.now().subtract(Duration(days: random.nextInt(30)));
@@ -58,22 +58,22 @@ class Samples {
       String orderStatus = random.nextBool() ? "Pending" : "Completed";
       Person? lastUpdated = samplePerson;
 
-      Item item = Item(
-        id: id,
-        groupId: groupId,
-        desc: desc,
-        vendors: vendors,
-        inOrder: inOrder,
-        stockQuantity: stockQuantity,
-        lastCheckDate: lastCheckDate,
-        unitPrice: unitPrice,
-        inventoryValue: inventoryValue,
-        orderStatus: orderStatus,
-        lastUpdated: lastUpdated,
-        buyingUnits: buyingUnit,
-        sellingUnits: sellingUnit,
-      );
-      items.add(item);
+      final Stock stockItem = Stock(
+          product: Product(
+            stockingUnit: "Box",
+            id: id,
+            desc: desc,
+            vendors: vendors,
+            unitPrice: unitPrice,
+            orderStatus: orderStatus,
+            lastUpdated: lastUpdated,
+            buyingUnits: buyingUnit,
+            sellingUnits: sellingUnit,
+          ),
+          stockQuantity: stockQuantity,
+          inventoryValue: inventoryValue,
+          lastCheckDate: lastCheckDate);
+      items.add(stockItem);
     }
 
     return items;

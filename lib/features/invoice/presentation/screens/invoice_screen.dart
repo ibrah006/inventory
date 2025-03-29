@@ -1,13 +1,12 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart' as mt;
-import 'package:inventory/features/customer/presentation/providers/customer_provider.dart';
-import 'package:inventory/features/inventory/presentation/providers/stock_provider.dart';
-import 'package:inventory/features/invoice/data/invoice.dart';
+import 'package:inventory/core/providers/customer_provider.dart';
+import 'package:inventory/core/providers/stock_provider.dart';
+import 'package:inventory/core/models/invoice.dart';
 import 'package:inventory/features/invoice/data/invoice_item.dart';
 import 'package:inventory/features/invoice/presentation/widgets/reusable_card.dart';
-import 'package:inventory/features/vendor/presentation/providers/vendors_provider.dart';
+import 'package:inventory/core/providers/vendors_provider.dart';
 import 'package:inventory/presentation/stream_state/stream_state_manager.dart';
 import 'package:inventory/presentation/widgets/dialogs.dart';
 import 'package:inventory/presentation/widgets/tables/custom_table/column_item.dart';
@@ -199,14 +198,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               items: stockItems
                                   .map<AutoSuggestBoxItem>((stockItem) {
                                 return AutoSuggestBoxItem(
-                                    value: stockItem.id,
+                                    value: stockItem.product.id,
                                     onSelected: () {
                                       setState(() {
                                         newInvoiceRow
-                                            .onNewIdSelected(stockItem);
+                                            .onNewIdSelected(stockItem.product);
                                       });
                                     },
-                                    label: "${stockItem.id} ${stockItem.desc}");
+                                    label:
+                                        "${stockItem.product.id} ${stockItem.product.desc}");
                               }).toList(),
                               placeholder: "Enter item",
                             ),

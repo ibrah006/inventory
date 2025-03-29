@@ -1,4 +1,4 @@
-import 'package:inventory/features/invoice/data/invoice.dart';
+import 'package:inventory/core/models/invoice.dart';
 import 'package:inventory/features/invoice/data/invoice_item.dart';
 
 class PurchaseInvoice extends Invoice {

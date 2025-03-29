@@ -1,11 +1,11 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:inventory/core/extensions/date_format_check.dart';
 import 'package:inventory/data/models/party.dart';
-import 'package:inventory/features/customer/data/customer.dart';
-import 'package:inventory/features/invoice/data/invoice_delivery.dart';
+import 'package:inventory/core/models/customer.dart';
+import 'package:inventory/core/models/invoice_delivery.dart';
 import 'package:inventory/features/invoice/data/invoice_item.dart';
-import 'package:inventory/features/project/data/project.dart';
-import 'package:inventory/features/vendor/data/vendor.dart';
+import 'package:inventory/core/models/project.dart';
+import 'package:inventory/core/models/vendor.dart';
 
 abstract class Invoice {
   abstract String? initialItemDesc;
@@ -42,11 +42,11 @@ abstract class Invoice {
 
   Project? project;
 
-  /// (Optinal) Notes or Terms
+  /// (Optional) Notes or Terms
   String get notes => notesController.text.trim();
   set notes(String newNote) => notesController.text = newNote;
 
-  /// Optional payment mathod field
+  /// Optional payment method field
   String? paymentMethod;
 
   /// issue and due date fields
@@ -127,7 +127,7 @@ abstract class Invoice {
   // Method to convert the object to a JSON format (for API communication or persistence)
   Map<String, dynamic> toJson() {
     return {
-      'party': party.toMap(),
+      'party': party.toJson(),
       'invoiceNumber': invoiceNumber,
       'issueDate': issueDate,
       'dueDate': dueDate,
@@ -224,7 +224,7 @@ abstract class Invoice {
     return validations;
   }
 
-  // FIELDS //
+  // INPUT FIELDS //
 
   final TextEditingController itemNameController = TextEditingController();
 

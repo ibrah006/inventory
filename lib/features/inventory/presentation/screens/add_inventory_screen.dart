@@ -2,18 +2,17 @@ import 'dart:math';
 
 import 'package:fluent_ui/fluent_ui.dart';
 
-import 'package:inventory/features/inventory/data/item.dart';
+import 'package:inventory/core/providers/product_provider.dart';
 import 'package:inventory/features/inventory/data/units.dart';
 import 'package:inventory/features/inventory/presentation/providers/helper/buying_units.dart';
 import 'package:inventory/features/inventory/presentation/providers/helper/selling_units.dart';
-import 'package:inventory/features/inventory/presentation/providers/stock_provider.dart';
+import 'package:inventory/core/providers/stock_provider.dart';
 import 'package:inventory/features/inventory/presentation/providers/unit_measure_provider.dart';
 import 'package:inventory/features/inventory/presentation/providers/unit_provider.dart';
 import 'package:inventory/features/inventory/presentation/screens/stats_screen.dart';
 import 'package:inventory/features/inventory/presentation/screens/unit_measure_screen.dart';
 import 'package:inventory/features/vendor/presentation/screens/vendor_list_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart' show InkWell, Material;
 
 class AddInventoryScreen extends StatefulWidget {
@@ -55,7 +54,7 @@ class _AddInventoryState extends State<AddInventoryScreen> {
       ),
       onClosed: () {
         setState(() {
-          tabs!.remove(tab);
+          tabs.remove(tab);
 
           if (currentIndex > 0) currentIndex--;
         });
@@ -176,8 +175,8 @@ class _AddInventoryState extends State<AddInventoryScreen> {
                       if (oldIndex < newIndex) {
                         newIndex -= 1;
                       }
-                      final item = tabs!.removeAt(oldIndex);
-                      tabs!.insert(newIndex, item);
+                      final item = tabs.removeAt(oldIndex);
+                      tabs.insert(newIndex, item);
 
                       if (currentIndex == newIndex) {
                         currentIndex = oldIndex;
@@ -234,24 +233,25 @@ class _AddInventoryState extends State<AddInventoryScreen> {
 
                     if (validateTextBoxes) return;
 
-                    final item = Item.create(
-                        id: id,
-                        desc: desc,
-                        groupId: Uuid().v1(),
-                        buyingUnits: Units.fromUnitsProvider(
-                            buyingUnitsProvider,
-                            isBuyingUnits: true),
-                        sellingUnits: Units.fromUnitsProvider(
-                            sellingUnitsProvider,
-                            isBuyingUnits: false));
-
-                    Provider.of<StockProvider>(context, listen: false)
-                        .add(item);
+                    Provider.of<ProductProvider>(context, listen: false)
+                        .createProduct(
+                            id: id,
+                            desc: desc,
+                            // TODO: this makes it so that everytime you create a product from the add inventory screen, it will always set its unit price to 0.
+                            unitPrice: null,
+                            buyingUnits: Units.fromUnitsProvider(
+                                buyingUnitsProvider,
+                                isBuyingUnits: true),
+                            sellingUnits: Units.fromUnitsProvider(
+                                sellingUnitsProvider,
+                                isBuyingUnits: false),
+                            stockingUnit: stockingUnit);
 
                     for (final stockItem
                         in Provider.of<StockProvider>(context, listen: false)
                             .getStock()) {
-                      print("stock item ${stockItem.id}: ${stockItem.toMap()}");
+                      print(
+                          "stock item ${stockItem.product.id}: ${stockItem.toMap()}");
                     }
                   },
                 ),

@@ -1,7 +1,9 @@
 import 'package:inventory/data/models/party.dart';
 
 class Customer extends Party {
-  Customer(super.context, {required super.id});
+  Customer.create({required super.name, required super.id});
+
+  Customer.fromId({required super.id}) : super.fromId(Customer);
 
   Customer.copy(Party other) : super.copy(other);
 }

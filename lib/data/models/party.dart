@@ -1,8 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:inventory/features/customer/data/customer.dart';
-import 'package:inventory/features/customer/presentation/providers/customer_provider.dart';
-import 'package:inventory/features/vendor/data/vendor.dart';
-import 'package:inventory/features/vendor/presentation/providers/vendors_provider.dart';
+import 'package:inventory/core/models/customer.dart';
+import 'package:inventory/core/providers/customer_provider.dart';
+import 'package:inventory/core/models/vendor.dart';
+import 'package:inventory/core/providers/vendors_provider.dart';
 import 'package:inventory/presentation/providers/party_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -22,12 +22,10 @@ final Map<PartyValidationFeedback, String> _errorMessages = {
 };
 
 abstract class Party {
-  Party(BuildContext context, {required this.id}) {
-    name = context
-        .read<VendorsProvider>()
-        .parties
-        .firstWhere((party) => party.id == id)
-        .name;
+  Party({required this.name, required this.id});
+
+  Party.fromId(Type runtimeType, {required this.id}) {
+    // TODO: Get name from database. Either from Vendor table or Customer table depending on th runtimeType
   }
 
   bool get _isVendor {
@@ -56,12 +54,11 @@ abstract class Party {
     id = "";
   }
 
-  Party.create({required this.id, required this.name});
-
   late String id;
+
   late String name;
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {"id": id, "name": name};
   }
 }

@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:inventory/config/routes.dart';
 import 'package:inventory/core/constants/in_out_icons.dart';
-import 'package:inventory/features/inventory/presentation/providers/stock_provider.dart';
+import 'package:inventory/core/providers/stock_provider.dart';
 import 'package:inventory/features/invoice/data/invoice_item.dart';
 import 'package:inventory/features/invoice/data/purchase_invoice.dart';
 import 'package:inventory/features/invoice/data/sales_invoice.dart';
@@ -61,9 +61,9 @@ class _StockTableState extends State<StockTable> {
         .getStock()
         .map<StockInfo>((stockItem) {
       return StockInfo(
-          name: "${stockItem.id} ${stockItem.desc}",
+          name: "${stockItem.product.id} ${stockItem.product.desc}",
           quantity: stockItem.stockQuantity,
-          amount: stockItem.getTotalValue());
+          amount: stockItem.inventoryValue);
     }).toList();
 
     return Card(

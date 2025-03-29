@@ -1,8 +1,11 @@
 import 'package:inventory/data/models/party.dart';
 
 class Vendor extends Party {
-  Vendor(super.context, {required super.id});
-  Vendor.create({required super.id, required super.name}) : super.create();
+  Vendor.fromId({
+    required super.id,
+  }) : super.fromId(Vendor);
+
+  Vendor.create({required super.id, required super.name});
   // Vendor(super.context, {required super.id});
 
 //   Vendor(BuildContext context, {required this.id}) {
@@ -14,6 +17,18 @@ class Vendor extends Party {
 //   }
 
   Vendor.copy(Party other) : super.copy(other);
+
+  // Vendor fromJson (takes a Map and Context for provider)
+  factory Vendor.fromJson(Map<String, dynamic> json) {
+    return Vendor.fromId(id: json['id']);
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final vendorMap = super.toJson();
+    vendorMap['type'] = 'vendor'; // Adding type for identifying Vendor
+    return vendorMap;
+  }
 
 //   // Vendor.fromJson(Map json) {
 //   //   // return Vendor(context, id: id);

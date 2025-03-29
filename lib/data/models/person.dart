@@ -3,6 +3,10 @@ class Person {
     _name = name;
   }
 
+  factory Person.fromJson(Map json) {
+    return Person(name: json["name"]);
+  }
+
   late String _name;
 
   String get name => _name;
@@ -11,7 +15,7 @@ class Person {
     _name = value;
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       "name": _name,
     };

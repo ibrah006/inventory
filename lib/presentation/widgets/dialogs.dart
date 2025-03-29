@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:inventory/features/invoice/data/invoice.dart';
+import 'package:inventory/core/models/invoice.dart';
 
 class Dialogs {
   static final Map<InvoiceValidationFeedback, String>
