@@ -1,8 +1,4 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:inventory/core/models/customer.dart';
-import 'package:inventory/core/providers/customer_provider.dart';
-import 'package:inventory/core/models/vendor.dart';
-import 'package:inventory/core/providers/vendors_provider.dart';
 import 'package:inventory/presentation/providers/party_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -15,56 +11,103 @@ enum PartyValidationFeedback {
   valid,
 }
 
+enum PartyType { vendor, customer }
+
 final Map<PartyValidationFeedback, String> _errorMessages = {
   PartyValidationFeedback.emptyInputError: "Cannot leave this field empty",
   PartyValidationFeedback.vendorExistsError:
       "Please enter a different ID/Name. Inputted ID/Name already corresponds to a different Vendor."
 };
 
-abstract class Party {
-  Party({required this.name, required this.id});
+class Party {
+  Party({required this.name, required this.id, required this.type});
 
-  Party.fromId(Type runtimeType, {required this.id}) {
+  Party.fromId({required this.id, required this.type}) {
     // TODO: Get name from database. Either from Vendor table or Customer table depending on th runtimeType
   }
 
-  bool get _isVendor {
-    return this.runtimeType.toString() == "Vendor" ||
-        this.runtimeType.toString() == "FutureVendor";
-  }
+  Party.vendor({
+    required String? name,
+    required this.id,
+  })  : type = PartyType.vendor,
+        name = name ?? getPartyName(id);
 
-  PartyProvider _getPartyProvider(BuildContext context) {
-    return _isVendor
-        ? context.read<VendorsProvider>()
-        : context.read<CustomerProvider>();
-  }
+  Party.customer({
+    required String? name,
+    required this.id,
+  })  : type = PartyType.customer,
+        name = name ?? getPartyName(id);
 
-  Party.copy(Party other) {
-    // Vendor(context, id: id);
-    name = other.name;
-    id = other.id;
-  }
+  // Factory constructor from JSON
+  factory Party.fromJson(Map<String, dynamic> json) {
+    // Parse the 'type' field and map it to the correct PartyType enum
+    final partyType =
+        PartyType.values.firstWhere((e) => e.name == json['type']);
 
-  // Party.fromJson(Map json) {
-  //   // return Vendor(context, id: id);
-  // }
-
-  Party._future() {
-    name = "";
-    id = "";
+    return Party(
+      name: json['name'] as String,
+      id: json['id'] as String,
+      type: partyType,
+    );
   }
 
   late String id;
 
   late String name;
 
+  late PartyType type;
+
+  static String getPartyName(String id) {
+    // TODO: get party name from database
+    throw UnimplementedError();
+  }
+
+  bool get _isVendor => type == PartyType.vendor;
+
+  PartyProvider _getPartyProvider(BuildContext context) =>
+      context.read<PartyProvider>();
+
+  Party.copy(Party other) {
+    // Vendor(context, id: id);
+    name = other.name;
+    id = other.id;
+    type = other.type;
+  }
+
+  // Party.fromJson(Map json) {
+  //   // return Vendor(context, id: id);
+  // }
+
+  Party._future({required this.type}) {
+    name = "";
+    id = "";
+  }
+
   Map<String, dynamic> toJson() {
-    return {"id": id, "name": name};
+    return {
+      "id": id,
+      "name": name,
+      "type": type.name, // Convert enum to string
+    };
   }
 }
 
-abstract class FutureParty extends Party {
-  FutureParty({this.showIdTextBox = false}) : super._future();
+class FutureParty extends Party {
+  // FutureParty.empty({this.showIdTextBox = false}) : super._future();
+
+  FutureParty.vendor({this.showIdTextBox = false})
+      : super._future(type: PartyType.vendor);
+
+  FutureParty.customer({this.showIdTextBox = false, party})
+      : super._future(type: PartyType.customer);
+
+  FutureParty.fromParty(Party party, {this.showIdTextBox = false})
+      : super.copy(party);
+
+  factory FutureParty.fromJson(Map<String, dynamic> json) {
+    return FutureParty.fromParty(Party.fromJson(json),
+        showIdTextBox: json["showIdTextBox"] ?? false);
+  }
 
   // factory FutureParty.fromParty(Vendor party) {
   //   id = party.id;
@@ -112,7 +155,7 @@ abstract class FutureParty extends Party {
 
   _updatePartyProvider(BuildContext context) {
     _getPartyProvider(context)
-        .add(_isVendor ? Vendor.copy(this) : Customer.copy(this));
+        .add(_isVendor ? Party.copy(this) : Party.copy(this));
   }
 
   /// Be sure to set State after the calling of this function

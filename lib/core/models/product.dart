@@ -1,14 +1,14 @@
+import 'package:inventory/data/models/party.dart';
 import 'package:inventory/data/models/person.dart';
 import 'package:inventory/features/inventory/data/units.dart';
 import 'package:inventory/features/inventory/presentation/providers/helper/buying_units.dart';
 import 'package:inventory/features/inventory/presentation/providers/helper/selling_units.dart';
-import 'package:inventory/core/models/vendor.dart';
 
 class Product {
   Product(
       {required String id,
       required String desc,
-      required List<Vendor>? vendors,
+      required List<Party>? vendors,
       required String orderStatus,
       required Person? lastUpdated,
       required Units buyingUnits,
@@ -51,8 +51,8 @@ class Product {
   late String _desc;
   String get desc => _desc;
 
-  late List<Vendor>? _vendors;
-  List<Vendor>? get vendors => _vendors;
+  late List<Party>? _vendors;
+  List<Party>? get vendors => _vendors;
 
   late String _orderStatus;
   String get orderStatus => _orderStatus;
@@ -90,7 +90,7 @@ class Product {
       id: json['id'] as String,
       desc: json['desc'] as String,
       vendors: (json['vendors'] as List<dynamic>?)
-          ?.map((vendorJson) => Vendor.fromJson(vendorJson))
+          ?.map((vendorJson) => Party.fromJson(vendorJson))
           .toList(),
       orderStatus: json['orderStatus'] as String,
       lastUpdated: json['lastUpdated'] != null

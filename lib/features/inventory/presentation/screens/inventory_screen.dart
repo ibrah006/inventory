@@ -3,7 +3,7 @@ import 'package:inventory/config/routes.dart';
 import 'package:inventory/core/constants/in_out_icons.dart';
 import 'package:inventory/features/inventory/data/samples.dart';
 import 'package:inventory/core/providers/stock_provider.dart';
-import 'package:inventory/core/providers/vendors_provider.dart';
+import 'package:inventory/presentation/providers/party_provider.dart';
 import 'package:inventory/presentation/widgets/tables/stock_table.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +28,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("vendors: ${context.read<VendorsProvider>().parties}");
+    debugPrint("vendors: ${context.read<PartyProvider>().parties}");
 
     return ScaffoldPage(
       header: PageHeader(

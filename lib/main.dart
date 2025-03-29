@@ -1,8 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:inventory/config/routes.dart';
-import 'package:inventory/core/providers/customer_provider.dart';
 import 'package:inventory/core/providers/stock_provider.dart';
-import 'package:inventory/core/providers/vendors_provider.dart';
+import 'package:inventory/presentation/providers/party_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -18,10 +17,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<StockProvider>(
             create: (context) => StockProvider()),
-        ChangeNotifierProvider<VendorsProvider>(
-            create: (context) => VendorsProvider()),
-        ChangeNotifierProvider<CustomerProvider>(
-            create: (context) => CustomerProvider())
+        ChangeNotifierProvider<PartyProvider>(
+            create: (context) => PartyProvider()),
       ],
       child: FluentApp(
         debugShowCheckedModeBanner: false,

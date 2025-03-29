@@ -1,9 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:inventory/core/models/invoice.dart';
 import 'package:inventory/features/inventory/presentation/screens/add_inventory_screen.dart';
 import 'package:inventory/features/inventory/presentation/screens/inventory_screen.dart';
-import 'package:inventory/features/invoice/data/purchase_invoice.dart';
-import 'package:inventory/features/invoice/data/sales_invoice.dart';
 import 'package:inventory/features/invoice/presentation/screens/invoice_screen.dart';
 
 class AppRoutes {
@@ -21,9 +20,9 @@ class AppRoutes {
         case add:
           return AddInventoryScreen();
         case salesInvoice:
-          return InvoiceScreen(SalesInvoice());
+          return InvoiceScreen(Invoice.sales());
         case purchaseInvoice:
-          return InvoiceScreen(PurchaseInvoice());
+          return InvoiceScreen(Invoice.purchase());
         default:
           return Placeholder();
       }

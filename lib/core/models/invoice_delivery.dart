@@ -13,4 +13,19 @@ class InvoiceDelivery {
   InvoiceDelivery.empty() : status = "";
 
   final TextEditingController dueDateController = TextEditingController();
+
+  // Factory constructor to create an InvoiceDelivery from JSON
+  factory InvoiceDelivery.fromJson(Map<String, dynamic> json) {
+    return InvoiceDelivery(
+      status: json['status'] as String? ??
+          "", // Default to empty if no status is provided
+    )..dueDate = json['dueDate'] as String? ?? ""; // Set dueDate if provided
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'dueDate': dueDate,
+    };
+  }
 }

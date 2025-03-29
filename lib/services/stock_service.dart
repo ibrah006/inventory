@@ -1,41 +1,34 @@
 import 'package:dio/dio.dart';
-import 'package:inventory/core/models/vendor.dart';
+import 'package:inventory/core/models/stock.dart';
 
-class VendorService {
+class StockService {
   final Dio _dio =
-      Dio(BaseOptions(baseUrl: 'http://your-backend-api.com/vendors'));
+      Dio(BaseOptions(baseUrl: 'http://your-backend-api.com/stock'));
 
-  Future<List<Vendor>> getVendors() async {
+  Future<List<Stock>> getStock() async {
     try {
       final response = await _dio.get('/');
-      return (response.data as List).map((e) => Vendor.fromJson(e)).toList();
+      return (response.data as List).map((e) => Stock.fromJson(e)).toList();
     } catch (e) {
-      throw Exception('Failed to load vendors: $e');
+      throw Exception('Failed to load stock: $e');
     }
   }
 
-  Future<Vendor> getVendorById(String id) async {
+  Future<Stock> getStockById(int id) async {
     try {
       final response = await _dio.get('/$id');
-      return Vendor.fromJson(response.data);
+      return Stock.fromJson(response.data);
     } catch (e) {
-      throw Exception('Vendor not found');
+      throw Exception('Stock item not found');
     }
   }
 
-  Future<void> createVendor(Map<String, dynamic> vendorData) async {
+  Future<void> updateStock(
+      String productId, Map<String, dynamic> stockData) async {
     try {
-      await _dio.post('/', data: vendorData);
+      await _dio.put('/update/$productId', data: stockData);
     } catch (e) {
-      throw Exception('Failed to create vendor');
-    }
-  }
-
-  Future<void> updateVendor(String id, Map<String, dynamic> vendorData) async {
-    try {
-      await _dio.put('/$id', data: vendorData);
-    } catch (e) {
-      throw Exception('Failed to update vendor');
+      throw Exception('Failed to update stock');
     }
   }
 }

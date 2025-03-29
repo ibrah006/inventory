@@ -1,23 +1,23 @@
 import 'package:dio/dio.dart';
-import 'package:inventory/core/models/vendor.dart';
+import 'package:inventory/data/models/party.dart';
 
-class VendorService {
+class PartyService {
   final Dio _dio =
       Dio(BaseOptions(baseUrl: 'http://your-backend-api.com/vendors'));
 
-  Future<List<Vendor>> getVendors() async {
+  Future<List<Party>> getVendors() async {
     try {
       final response = await _dio.get('/');
-      return (response.data as List).map((e) => Vendor.fromJson(e)).toList();
+      return (response.data as List).map((e) => Party.fromJson(e)).toList();
     } catch (e) {
       throw Exception('Failed to load vendors: $e');
     }
   }
 
-  Future<Vendor> getVendorById(String id) async {
+  Future<Party> getVendorById(String id) async {
     try {
       final response = await _dio.get('/$id');
-      return Vendor.fromJson(response.data);
+      return Party.fromJson(response.data);
     } catch (e) {
       throw Exception('Vendor not found');
     }

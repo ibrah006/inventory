@@ -2,10 +2,8 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:inventory/config/routes.dart';
 import 'package:inventory/core/constants/in_out_icons.dart';
+import 'package:inventory/core/models/invoice.dart';
 import 'package:inventory/core/providers/stock_provider.dart';
-import 'package:inventory/features/invoice/data/invoice_item.dart';
-import 'package:inventory/features/invoice/data/purchase_invoice.dart';
-import 'package:inventory/features/invoice/data/sales_invoice.dart';
 import 'package:inventory/presentation/widgets/tables/row_info/stock_info.dart';
 import 'package:provider/provider.dart';
 
@@ -260,23 +258,11 @@ class _StockTableState extends State<StockTable> {
   }
 
   gotoInvoiceScreen({required bool isPurchase, required StockInfo data}) {
-    final List<InvoiceItem> invoiceInitialItems = [
-      InvoiceItem(
-          itemDesc: data.name,
-          quantity: 1,
-          amount: data.amount,
-          cost: data.amount)
-    ];
-
     Navigator.pushNamed(context,
         isPurchase ? AppRoutes.purchaseInvoice : AppRoutes.salesInvoice,
-        arguments: isPurchase
-            ? PurchaseInvoice(
-                invoiceInitialItems: invoiceInitialItems,
-                initialItemDesc: data.name)
-            : SalesInvoice(
-                invoiceInitialItems: invoiceInitialItems,
-                initialItemDesc: data.name));
+        arguments: Invoice(
+            // TODO: initialize Invoice number automatically
+            type: isPurchase ? InvoiceType.purchase : InvoiceType.sales));
   }
 
   List<TableRow> _buildInventoryTableRows() {

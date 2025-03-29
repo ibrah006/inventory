@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:inventory/core/models/stock.dart';
+import 'package:inventory/data/models/party.dart';
 import 'package:inventory/data/models/person.dart';
 import 'package:inventory/core/models/product.dart';
 import 'package:inventory/features/inventory/data/units.dart';
-import 'package:inventory/core/models/vendor.dart';
 
 class Samples {
   static List<Stock> generate() {
@@ -33,10 +33,10 @@ class Samples {
       "Drone"
     ];
 
-    List<Vendor> sampleVendors = [
-      Vendor.create(name: "Vendor A", id: "VENDOR-001"),
-      Vendor.create(name: "Vendor B", id: "VENDOR-002"),
-      Vendor.create(name: "Vendor C", id: "VENDOR-003"),
+    List<Party> sampleVendors = [
+      Party.vendor(name: "Vendor A", id: "VENDOR-001"),
+      Party.vendor(name: "Vendor B", id: "VENDOR-002"),
+      Party.vendor(name: "Vendor C", id: "VENDOR-003"),
     ];
 
     Person samplePerson = Person(name: "John Doe");
@@ -46,7 +46,7 @@ class Samples {
     for (int i = 0; i < 20; i++) {
       String id = "item_${i + 1}";
       String desc = itemDescriptions[random.nextInt(itemDescriptions.length)];
-      List<Vendor> vendors = [
+      List<Party> vendors = [
         sampleVendors[random.nextInt(sampleVendors.length)]
       ]; // Random vendor
       // int inOrder = random.nextInt(100);

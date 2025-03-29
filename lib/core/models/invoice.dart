@@ -1,14 +1,14 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:inventory/core/extensions/date_format_check.dart';
 import 'package:inventory/data/models/party.dart';
-import 'package:inventory/core/models/customer.dart';
 import 'package:inventory/core/models/invoice_delivery.dart';
 import 'package:inventory/features/invoice/data/invoice_item.dart';
 import 'package:inventory/core/models/project.dart';
-import 'package:inventory/core/models/vendor.dart';
 
-abstract class Invoice {
-  abstract String? initialItemDesc;
+enum InvoiceType { purchase, sales }
+
+class Invoice {
+  String? initialItemDesc;
 
   String get invoiceNumber => invoiceNumberController.text.trim();
   set invoiceNumber(String newInvoiceNumber) =>
@@ -16,12 +16,7 @@ abstract class Invoice {
 
   late FutureParty party;
 
-  bool get isPurchaseInvoice {
-    return getInvoiceType() == "Purchase";
-  }
-
-  String getInvoiceType() =>
-      this.runtimeType.toString() == "PurchaseInvoice" ? "Purchase" : "Sales";
+  late InvoiceType type;
 
   // late final double price;
   double get taxAmount {
@@ -64,6 +59,14 @@ abstract class Invoice {
   ///
   List<InvoiceItem> items = [];
 
+  factory Invoice.purchase() {
+    return Invoice(type: InvoiceType.purchase);
+  }
+
+  factory Invoice.sales() {
+    return Invoice(type: InvoiceType.sales);
+  }
+
   Invoice(
       {String? invoiceNumber,
       Party? party,
@@ -76,7 +79,9 @@ abstract class Invoice {
       String? issueDate,
       this.dueDate,
       this.subTotal = 0.0,
-      InvoiceDelivery? delivery
+      InvoiceDelivery? delivery,
+      required this.type
+
       // follpwing won't be part of the  database (ofc its a list)
       // Iterable<InvoiceItem>? items
       // String? unit,
@@ -99,10 +104,8 @@ abstract class Invoice {
     this.delivery = delivery ?? InvoiceDelivery.empty();
 
     this.party = party != null
-        ? (isPurchaseInvoice
-            ? FutureVendor.fromVendor(party as Vendor)
-            : FutureCustomer.fromCustomer(party as Customer))
-        : (isPurchaseInvoice ? FutureVendor.empty() : FutureCustomer.empty());
+        ? FutureParty.fromParty(party)
+        : (isPurchaseInvoice ? FutureParty.vendor() : FutureParty.customer());
 
     // this.items = ;
 
@@ -112,6 +115,41 @@ abstract class Invoice {
 
     dueDate = dueDate != null && dueDate!.trim().isEmpty ? null : dueDate;
   }
+
+  // Factory constructor to create an Invoice from JSON
+  factory Invoice.fromJson(Map<String, dynamic> json) {
+    // Parsing the invoice type
+    final typeString = json['type'] as String;
+    final type = InvoiceType.values.firstWhere(
+      (e) => e.toString().split('.').last == typeString,
+      orElse: () => InvoiceType.sales, // Default to sales if not found
+    );
+
+    // Parse nested fields
+    return Invoice(
+      invoiceNumber: json['invoiceNumber'] as String?,
+      party: json['party'] != null ? FutureParty.fromJson(json['party']) : null,
+      taxAmount: json['taxAmount'] != null
+          ? double.tryParse(json['taxAmount'].toString()) ?? 0.0
+          : 0.0,
+      poSoNumber: json['poSoNumber'] as String?,
+      project:
+          json['project'] != null ? Project.fromJson(json['project']) : null,
+      notes: json['notes'] as String?,
+      paymentMethod: json['paymentMethod'] as String?,
+      issueDate: json['issueDate'] as String?,
+      dueDate: json['dueDate'] as String?,
+      subTotal: json['subTotal'] != null
+          ? double.tryParse(json['subTotal'].toString()) ?? 0.0
+          : 0.0,
+      delivery: json['delivery'] != null
+          ? InvoiceDelivery.fromJson(json['delivery'])
+          : InvoiceDelivery.empty(),
+      type: type,
+    );
+  }
+
+  bool get isPurchaseInvoice => type == InvoiceType.purchase;
 
   // Method to calculate the total cost including tax
   double get totalAmount => subTotal + taxAmount;
@@ -131,9 +169,7 @@ abstract class Invoice {
       'invoiceNumber': invoiceNumber,
       'issueDate': issueDate,
       'dueDate': dueDate,
-      // 'price': price,
       'taxAmount': taxAmount,
-      // new
       "poSoNumber": poSoNumber,
       "project": project?.toMap(),
       "notes": notes,
