@@ -1,7 +1,11 @@
+import 'dart:ffi';
+
 import 'package:inventory/features/inventory/presentation/providers/unit_provider.dart';
 
 class Units<T> extends UnitProvider<T> {
   bool isBuyingUnits;
+
+  int? id;
 
   factory Units.fromUnitsProvider(UnitProvider unitProvider,
       {required bool isBuyingUnits, String unit = ""}) {
@@ -20,10 +24,11 @@ class Units<T> extends UnitProvider<T> {
   // Factory constructor to create a Units object from a JSON map
   factory Units.fromJson(Map<String, dynamic> json) {
     final units = Units<T>(isBuyingUnits: json['isBuyingUnits'] ?? false)
-      ..isSameAsStockingUnit = json['isSameAsStockingUnit'] ?? false
-      ..unitController.text = json['unit'] ?? ""
-      ..relationshipController.text = json['relationship'] ?? ""
-      ..relationshipBy = json['relationBy'];
+      ..unit = json['unit']
+      // TODO : remove once the server handles this work
+      ..relationship = (json["relationship"] as int).toDouble()
+      ..relationshipBy = json['relationBy']
+      ..id = json['id'] as int;
 
     return units;
   }
@@ -31,9 +36,9 @@ class Units<T> extends UnitProvider<T> {
   Map<String, dynamic> toJson() {
     return {
       "isBuyingUnits": isBuyingUnits,
-      "isSameAsStockingUnit": isSameAsStockingUnit,
-      "unit": unitController.text,
-      "relationship": relationshipController.text,
+      // "isSameAsStockingUnit": isSameAsStockingUnit,
+      "unit": unit,
+      "relationship": relationship,
       "relationBy": relationshipBy
     };
   }

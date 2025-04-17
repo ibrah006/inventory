@@ -1,14 +1,17 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:intl/intl.dart';
 import 'package:inventory/core/extensions/date_format_check.dart';
-import 'package:inventory/data/models/party.dart';
+import 'package:inventory/core/models/party.dart';
 import 'package:inventory/core/models/invoice_delivery.dart';
 import 'package:inventory/features/invoice/data/invoice_item.dart';
 import 'package:inventory/core/models/project.dart';
+import 'package:inventory/services/invoice_service.dart';
 
 enum InvoiceType { purchase, sales }
 
 class Invoice {
-  String? initialItemDesc;
+  // TODO: change this to initial invoice item (product model)
+  String? initialItemId;
 
   String get invoiceNumber => invoiceNumberController.text.trim();
   set invoiceNumber(String newInvoiceNumber) =>
@@ -46,7 +49,9 @@ class Invoice {
 
   /// issue and due date fields
   String get issueDate => issueDateController.text.trim();
-  set issueDate(String newValue) => issueDateController.text = newValue;
+  set issueDate(String newValue) {
+    issueDateController.text = newValue;
+  }
 
   /// [dueDate] will not take in empty string. If inputted with empty string it will set itself to null.
   String? dueDate;
@@ -88,17 +93,29 @@ class Invoice {
       // String? price,
       // String? taxAmount,
       }) {
-    if (invoiceNumber != null &&
-        taxAmount != null &&
-        poSoNumber != null &&
-        notes != null &&
-        issueDate != null &&
-        party != null) {
+    if (invoiceNumber != null) {
       this.invoiceNumber = invoiceNumber;
+    }
+
+    if (taxAmount != null) {
       this.taxAmount = taxAmount;
+    }
+
+    if (poSoNumber != null) {
       this.poSoNumber = poSoNumber;
+    }
+
+    if (notes != null) {
       this.notes = notes;
+    }
+
+    if (issueDate != null) {
       this.issueDate = issueDate;
+    }
+
+    if (party != null) {
+      // TODO: remove this if this casues any issues. No factors of pary's functions considered before changing this code from previois version
+      this.party = FutureParty.fromParty(party);
     }
 
     this.delivery = delivery ?? InvoiceDelivery.empty();
@@ -121,23 +138,26 @@ class Invoice {
     // Parsing the invoice type
     final typeString = json['type'] as String;
     final type = InvoiceType.values.firstWhere(
-      (e) => e.toString().split('.').last == typeString,
-      orElse: () => InvoiceType.sales, // Default to sales if not found
+      (e) => e.name == typeString,
+      orElse: () => InvoiceType.purchase, // Default to purchase if not found
     );
+
+    final issueDate =
+        (json['issueDate'] as String).formatDateFromDatabaseString();
 
     // Parse nested fields
     return Invoice(
-      invoiceNumber: json['invoiceNumber'] as String?,
+      invoiceNumber: json['id'].toString(),
       party: json['party'] != null ? FutureParty.fromJson(json['party']) : null,
-      taxAmount: json['taxAmount'] != null
-          ? double.tryParse(json['taxAmount'].toString()) ?? 0.0
+      taxAmount: json['tax'] != null
+          ? double.tryParse(json['tax'].toString()) ?? 0.0
           : 0.0,
       poSoNumber: json['poSoNumber'] as String?,
       project:
           json['project'] != null ? Project.fromJson(json['project']) : null,
       notes: json['notes'] as String?,
       paymentMethod: json['paymentMethod'] as String?,
-      issueDate: json['issueDate'] as String?,
+      issueDate: issueDate,
       dueDate: json['dueDate'] as String?,
       subTotal: json['subTotal'] != null
           ? double.tryParse(json['subTotal'].toString()) ?? 0.0
@@ -166,15 +186,18 @@ class Invoice {
   Map<String, dynamic> toJson() {
     return {
       'party': party.toJson(),
-      'invoiceNumber': invoiceNumber,
+      'id': invoiceNumber,
       'issueDate': issueDate,
       'dueDate': dueDate,
-      'taxAmount': taxAmount,
+      'tax': taxAmount,
       "poSoNumber": poSoNumber,
-      "project": project?.toMap(),
+      // "project": project?.toMap(),
       "notes": notes,
+      "delivery": delivery.toJson(),
       "paymentMethod": paymentMethod,
       "subTotal": subTotal,
+      "items": items.map((item) => item.toJson()).toList(),
+      "type": isPurchaseInvoice ? "purchase" : "sales"
     };
   }
 
@@ -262,6 +285,17 @@ class Invoice {
     return validations;
   }
 
+  void onIssueDateSubmitted() {
+    final dueDate = dueDateController.text.trim();
+
+    if (dueDate.isEmpty && issueDate.isValidDate()) {
+      final issueDateDatetime = DateFormat("dd/MM/yyyy").parse(issueDate);
+      final dueDateDatetime = issueDateDatetime.add(Duration(days: 30));
+
+      dueDateController.text = DateFormat('dd/MM/yyyy').format(dueDateDatetime);
+    }
+  }
+
   // INPUT FIELDS //
 
   final TextEditingController itemNameController = TextEditingController();
@@ -272,6 +306,17 @@ class Invoice {
       issueDateController = TextEditingController(),
       dueDateController = TextEditingController(),
       taxController = TextEditingController();
+
+  // DATABASE INTEGRATION
+
+  Future<void> insert() async {
+    await InvoiceService.createInvoice(toJson());
+  }
+
+  Future<void> update() async {
+    throw UnimplementedError();
+    // InvoiceService.updateInvoice(int.parse(invoiceNumber), toJson());
+  }
 }
 
 enum InvoiceValidationFeedback {

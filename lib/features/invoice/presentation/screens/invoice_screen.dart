@@ -1,18 +1,21 @@
+import 'dart:math';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart' as mt;
 import 'package:inventory/config/routes.dart';
+import 'package:inventory/core/models/stock.dart';
 import 'package:inventory/core/providers/invoice_provider.dart';
 import 'package:inventory/core/providers/stock_provider.dart';
 import 'package:inventory/core/models/invoice.dart';
 import 'package:inventory/features/invoice/data/invoice_item.dart';
 import 'package:inventory/features/invoice/presentation/widgets/reusable_card.dart';
+import 'package:inventory/features/invoice/presentation/widgets/units_split_button.dart';
 import 'package:inventory/presentation/providers/party_provider.dart';
 import 'package:inventory/presentation/stream_state/stream_state_manager.dart';
 import 'package:inventory/presentation/widgets/dialogs.dart';
 import 'package:inventory/presentation/widgets/tables/custom_table/column_item.dart';
 import 'package:inventory/presentation/widgets/tables/custom_table/custom_table.dart';
-import 'package:inventory/presentation/widgets/tables/row_info/row_info_regular.dart';
 import 'package:provider/provider.dart';
 import 'package:super_context_menu/super_context_menu.dart';
 
@@ -38,7 +41,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       .title!
       .copyWith(fontWeight: FontWeight.w400);
 
-  InvoiceItem newInvoiceRow = InvoiceItem();
+  late InvoiceItem newInvoiceRow;
 
   final StreamStateManager newInvoiceRowAmountFieldState = StreamStateManager();
 
@@ -49,7 +52,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   bool editTax = false;
 
   void updatenewInvoiceRowAmountTextBox() {
-    newInvoiceRow.amount = newInvoiceRow.cost * newInvoiceRow.quantity;
+    newInvoiceRow.amount = newInvoiceRow.amount;
     newInvoiceRowAmountFieldState.updateState();
   }
 
@@ -78,14 +81,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     final isNotesFieldOnLeft =
         screenHeight > InvoiceScreen.MIN_SCREEN_HEIGHT_NOTES_LEFT;
-
     return Provider<InvoiceProvider>(
       create: (context) => InvoiceProvider(invoice.type),
       builder: (context, child) {
         // passing in the context is crucial here as it will be used to determine the type of invoice screen (purchase/sales) the user's at through InvoiceProvider
         final parties = partyProvider.parties(context);
-
-        debugPrint("parties: $parties");
 
         return FluentTheme(
           data: FluentThemeData(scaffoldBackgroundColor: Color(0xFFeff3f6)),
@@ -181,10 +181,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                           CustomTable(
                             columnItems: [
                               ColumnItem(title: "", flex: .4),
-                              ColumnItem(title: "Items", flex: 3),
-                              ColumnItem(title: "Qty", flex: .9),
-                              ColumnItem(title: "Cost", flex: 1.2),
-                              ColumnItem(title: "Amount", flex: 1.5)
+                              ColumnItem(title: "Items", flex: 2.5),
+                              ColumnItem(title: "Qty/Roll Ln.(m)", flex: 1.5),
+                              ColumnItem(title: "Cost", flex: 1.15),
+                              ColumnItem(title: "Amount", flex: 1.3),
                             ],
                             // dataCellItems: {},
                             data: invoice.items
@@ -195,40 +195,55 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                           Row(
                             children: [
                               Expanded(
-                                flex: 48,
+                                flex: 50,
                                 child: AutoSuggestBox(
                                   // TODO; pass in the stock items
                                   controller: newInvoiceRow.itemDescController,
+                                  onChanged: (newValue, textChangedReason) {
+                                    newInvoiceRow.onItemDescriptionFieldChanged(
+                                        context, newValue, textChangedReason);
+                                  },
                                   items: stockItems
                                       .map<AutoSuggestBoxItem>((stockItem) {
                                     return AutoSuggestBoxItem(
                                         value: stockItem.product.id,
                                         onSelected: () {
+                                          print(
+                                              "selected id; ${stockItem.product.id}");
                                           setState(() {
                                             newInvoiceRow.onNewIdSelected(
                                                 stockItem.product);
                                           });
                                         },
+                                        child: Text(
+                                          "${stockItem.product.id} ${stockItem.product.name}",
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                         label:
-                                            "${stockItem.product.id} ${stockItem.product.desc}");
+                                            "${stockItem.product.id} ${stockItem.product.name}");
                                   }).toList(),
                                   placeholder: "Enter item",
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                flex: 12,
-                                child: TextBox(
-                                  controller: newInvoiceRow.quantityController,
-                                  placeholder: "Qty",
-                                  onChanged: (value) {
-                                    updatenewInvoiceRowAmountTextBox();
-                                  },
-                                ),
-                              ),
+                                  flex: 30,
+                                  child: UnitsSplitButton(
+                                      updateParentState: () {
+                                        setState(() {
+                                          newInvoiceRow.amount =
+                                              newInvoiceRow.amount;
+                                        });
+                                      },
+                                      selectedItem: newInvoiceRow,
+                                      onChanged: (newValue) {
+                                        updatenewInvoiceRowAmountTextBox();
+                                      },
+                                      controller:
+                                          newInvoiceRow.measureController)),
                               const SizedBox(width: 12),
                               Expanded(
-                                flex: 16,
+                                flex: 23,
                                 child: TextBox(
                                   controller: newInvoiceRow.costController,
                                   placeholder: "Cost",
@@ -238,7 +253,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                flex: 22,
+                                flex: 26,
                                 child: StreamBuilder(
                                     stream:
                                         newInvoiceRowAmountFieldState.stream,
@@ -345,7 +360,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                       label: deliveryDueDateTextBoxLabel,
                                       child: TextBox(
                                         controller:
-                                            invoice.delivery.dueDateController,
+                                            invoice.delivery?.dueDateController,
                                         placeholder: "DD/MM/YYYY",
                                         suffix: Icon(FluentIcons.calendar),
                                       ),
@@ -448,9 +463,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                   .copyWith(
                                                       fontWeight:
                                                           FontWeight.w500),
-                                              onSubmitted: (value) => invoice
-                                                  .party
-                                                  .validateIdTextField(context),
+                                              onSubmitted: (value) async {
+                                                await invoice.party
+                                                    .validateIdTextField(
+                                                        context);
+                                              },
                                               padding: EdgeInsets.all(5.0),
                                               controller:
                                                   invoice.party.idController,
@@ -461,8 +478,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                     ),
                                     SizedBox(width: 5.0),
                                     FilledButton(
-                                      onPressed: () {
-                                        invoice.party
+                                      onPressed: () async {
+                                        await invoice.party
                                             .validateIdTextField(context);
                                       },
                                       style: ButtonStyle(
@@ -510,6 +527,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                       child: TextBox(
                                         controller: invoice.issueDateController,
                                         placeholder: "DD/MM/YYYY",
+                                        onSubmitted: (value) =>
+                                            invoice.onIssueDateSubmitted,
                                         suffix: FlyoutTarget(
                                           controller: issueDateMenuController,
                                           child: IconButton(
@@ -545,6 +564,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                     'dd/MM/yyyy')
                                                                 .format(DateTime
                                                                     .now());
+                                                            invoice
+                                                                .onIssueDateSubmitted();
                                                             ;
                                                             Flyout.of(context)
                                                                 .close();
@@ -796,8 +817,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     invoice = widget.invoice;
 
-    if (invoice.initialItemDesc != null) {
-      newInvoiceRow.itemDescController.text = invoice.initialItemDesc!;
+    newInvoiceRow = InvoiceItem(invoiceType: invoice.type);
+
+    if (invoice.initialItemId != null) {
+      // newInvoiceRow.itemDescController.text = invoice.initialItemDesc!;
+      // addInvoiceItem(productId: invoice.initialItemId);
+
+      newInvoiceRow.setId(context, invoice.initialItemId!);
     }
   }
 
@@ -846,8 +872,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     bool canAdd = false;
 
-    print(validateNewInvoiceRow);
-
     switch (validateNewInvoiceRow) {
       case AddInvoiceItemFeedback.itemError:
         Dialogs.itemNotFoundDialog(context, itemName: newInvoiceRow.itemDesc);
@@ -867,17 +891,16 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       setState(() {
         // invoiceRows.add();
 
-        invoice.add(InvoiceItem.fromRowInfo(RowInfo(
-            rowCells: List.generate(
-                4,
-                (index) => [
-                      newInvoiceRow.itemDescController.text,
-                      newInvoiceRow.quantityController.text,
-                      newInvoiceRow.costController.text,
-                      newInvoiceRow.amountController.text
-                    ][index]))));
-
-        invoice.subTotal += invoice.items.last.amount;
+        // invoice.add(InvoiceItem.fromRowInfo(RowInfo(
+        //     rowCells: List.generate(
+        //         4,
+        //         (index) => [
+        //               newInvoiceRow.itemDescController.text,
+        //               newInvoiceRow.quantityController.text,
+        //               newInvoiceRow.costController.text,
+        //               newInvoiceRow.amountController.text
+        //             ][index]))));
+        invoice.add(InvoiceItem.copy(newInvoiceRow));
       });
 
       newInvoiceRow.clearTextFields();
@@ -899,8 +922,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     // get sub-total
     // final subTotal =
     //     RowInfo.computeSummation(rows: invoiceRows, columnIndex: 3);
-
-    print("develiry status: ${invoice.delivery.status}");
 
     // final formattedToInvoiceItems = invoiceRows.map((rowInfo) {
     //   return InvoiceItem.fromRowInfo(rowInfo);
@@ -946,7 +967,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       // Add invoice entry
       Provider.of<StockProvider>(context, listen: false)
           .saveInvoiceEntry(invoice);
+
       // Add to Database
+      // Add to Invoice Entity
+      invoice.insert();
 
       // Reset All Fields
       final action = await Dialogs.showSuccessfullyAddInvoice(context);
@@ -957,11 +981,23 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 ? AppRoutes.purchaseInvoice
                 : AppRoutes.salesInvoice);
       } else {
-        Navigator.pop(context);
+        // Temporarily disabled
+        // Navigator.pop(context);
       }
     } else {
       await Dialogs.showInvoiceErrors(context,
           validationFeedbacks: validationFeedbacks);
     }
+  }
+
+  // Automate: Fill in with sample data
+  void automate() {
+    invoice.invoiceNumberController.text =
+        (10000000 * Random().nextInt(90000000)).toString();
+
+    // Sample item to select
+    final Stock sampleItem = context.read<StockProvider>().getStock().first;
+
+    newInvoiceRow.itemDescController.text = "${sampleItem.id}";
   }
 }

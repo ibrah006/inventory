@@ -1,4 +1,14 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:intl/intl.dart';
+
+extension ConvertDatabaseDateString on String {
+  String formatDateFromDatabaseString() {
+    final parsedDate = DateTime.parse(this);
+    final formatter = DateFormat('dd/MM/yyyy');
+    return formatter
+        .format(parsedDate.toLocal()); // Convert to local time if needed
+  }
+}
 
 extension StringIsValidDate on String {
   bool isValidDate({bool showDebugPrint = false}) {

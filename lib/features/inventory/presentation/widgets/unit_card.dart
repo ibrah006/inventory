@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:inventory/features/inventory/presentation/providers/unit_measure_provider.dart';
 import 'package:inventory/features/inventory/presentation/providers/unit_provider.dart';
+import 'package:inventory/features/invoice/presentation/widgets/reusable_card.dart';
 import 'package:provider/provider.dart';
 
 // T must be passed in
@@ -31,16 +32,11 @@ class _UnitCardState<T> extends State<UnitCard> {
 
     final stockingUnit = Provider.of<UnitMeasureProvider>(context).stockingUnit;
 
-    print("stocking unit: $stockingUnit");
-
     final bool isSameAsStockingUnit = details.isSameAsStockingUnit;
 
-    return Container(
+    return ReusableCard(
       padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.withAlpha(75)),
-        borderRadius: BorderRadius.circular(8),
-      ),
+      disableShadow: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

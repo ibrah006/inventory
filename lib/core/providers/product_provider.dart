@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:inventory/core/models/product.dart';
-import 'package:inventory/features/inventory/presentation/providers/helper/buying_units.dart';
-import 'package:inventory/features/inventory/presentation/providers/helper/selling_units.dart';
-import 'package:inventory/features/inventory/data/units.dart'; // Update this with your actual import
 
 class ProductProvider with ChangeNotifier {
   // List to hold products
@@ -10,6 +7,22 @@ class ProductProvider with ChangeNotifier {
 
   // Getter for the products list
   List<Product> get products => _products;
+
+  // Initialize the Memory with products
+  initializeProducts(List<Product> products) {
+    _products = products;
+  }
+
+  /// Gets product with specified item description from the Memory
+  /// Provide the full item description ' [productID] and [productName] '
+  Product? getProductByItemDescription(String itemDescription) {
+    try {
+      return products.firstWhere(
+          (product) => "${product.id} ${product.itemDesc}" == itemDescription);
+    } catch (e) {
+      return null;
+    }
+  }
 
   // Add a product
   void addProduct(Product product) {
@@ -33,21 +46,8 @@ class ProductProvider with ChangeNotifier {
   }
 
   // Create a new product and add it
-  void createProduct(
-      {required String id,
-      required String desc,
-      required double? unitPrice,
-      required Units<BuyingUnits> buyingUnits,
-      required Units<SellingUnits> sellingUnits,
-      required String stockingUnit}) {
-    final newProduct = Product.create(
-        id: id,
-        desc: desc,
-        unitPrice: unitPrice,
-        buyingUnits: buyingUnits,
-        sellingUnits: sellingUnits,
-        stockingUnit: stockingUnit);
-    addProduct(newProduct);
+  void createProduct(Product product) {
+    addProduct(product);
   }
 
   // Method to find a product by ID

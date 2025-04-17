@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:inventory/config/routes.dart';
@@ -59,62 +61,71 @@ class _StockTableState extends State<StockTable> {
         .getStock()
         .map<StockInfo>((stockItem) {
       return StockInfo(
-          name: "${stockItem.product.id} ${stockItem.product.desc}",
-          quantity: stockItem.stockQuantity,
+          name: "${stockItem.product.id} ${stockItem.product.name}",
+          quantity: stockItem.stockMeasure,
           amount: stockItem.inventoryValue);
     }).toList();
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(10).copyWith(bottom: 0),
+        padding: const EdgeInsets.all(0).copyWith(bottom: 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Inventory Table
-            Table(
-              border: TableBorder(
-                horizontalInside: BorderSide(width: 1, color: Colors.grey[30]),
-              ),
-              columnWidths: const {
-                0: FlexColumnWidth(.75),
-                1: FlexColumnWidth(3),
-                2: FlexColumnWidth(2),
-                3: FlexColumnWidth(2),
-                4: FlexColumnWidth(2),
-              },
-              children: [
-                TableRow(
-                  decoration: BoxDecoration(color: Colors.grey[10]),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Item Name',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Quantity',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Total',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ],
+            LayoutBuilder(builder: (context, constraints) {
+              print("table max width: ${constraints.maxWidth}");
+
+              final checkboxFlex = constraints.maxWidth > 488
+                  ? (constraints.maxWidth / 646.67) / 2
+                  : (constraints.maxWidth / 646.67) * 1.15;
+
+              return Table(
+                border: TableBorder(
+                  horizontalInside:
+                      BorderSide(width: 1, color: Colors.grey[30]),
                 ),
-              ],
-            ),
+                columnWidths: {
+                  0: FlexColumnWidth(checkboxFlex),
+                  1: FlexColumnWidth(3),
+                  2: FlexColumnWidth(2),
+                  3: FlexColumnWidth(2),
+                  4: FlexColumnWidth(2),
+                },
+                children: [
+                  TableRow(
+                    decoration: BoxDecoration(color: Colors.grey[10]),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Item Name',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Quantity',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Total',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            }),
 
             // Stock table rows
             Expanded(
@@ -143,22 +154,39 @@ class _StockTableState extends State<StockTable> {
                       ],
                     ))
                   : SingleChildScrollView(
-                      child: Table(
-                        border: TableBorder(
-                          horizontalInside:
-                              BorderSide(width: 1, color: Colors.grey[30]),
-                        ),
-                        columnWidths: const {
-                          0: FlexColumnWidth(.75),
-                          1: FlexColumnWidth(3),
-                          2: FlexColumnWidth(2),
-                          3: FlexColumnWidth(2),
-                          4: FlexColumnWidth(2),
-                        },
-                        children: [
-                          ..._buildInventoryTableRows(),
-                        ],
-                      ),
+                      child: LayoutBuilder(builder: (context, constraints) {
+                        final maxWidth = constraints.maxWidth;
+                        print("table max width: ${maxWidth}");
+
+                        double getExponent() {
+                          if (maxWidth < 540) return 1.0;
+
+                          // Smooth logarithmic growth
+                          double base = 540;
+                          return 1.0 + 2.2 * (log(maxWidth - base + 1) / ln10);
+                        }
+
+                        final checkboxFlex = maxWidth > 488
+                            ? (maxWidth / 646.67) / pow(1.15, getExponent())
+                            : (maxWidth / 646.67) * 1.15;
+
+                        return Table(
+                          border: TableBorder(
+                            horizontalInside:
+                                BorderSide(width: 1, color: Colors.grey[30]),
+                          ),
+                          columnWidths: {
+                            0: FlexColumnWidth(checkboxFlex),
+                            1: FlexColumnWidth(3),
+                            2: FlexColumnWidth(2),
+                            3: FlexColumnWidth(2),
+                            4: FlexColumnWidth(2),
+                          },
+                          children: [
+                            ..._buildInventoryTableRows(),
+                          ],
+                        );
+                      }),
                     ),
             ),
 

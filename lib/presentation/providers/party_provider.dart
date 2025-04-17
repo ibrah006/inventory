@@ -1,11 +1,17 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:inventory/core/models/invoice.dart';
 import 'package:inventory/core/providers/invoice_provider.dart';
-import 'package:inventory/data/models/party.dart';
+import 'package:inventory/core/models/party.dart';
+import 'package:inventory/services/party_service.dart';
 import 'package:provider/provider.dart';
 
 class PartyProvider extends ChangeNotifier {
-  final List<Party> _parties = [];
+  // First time loading of parties
+  Future<void> initialize() async {
+    _parties = await PartyService.getVendors();
+  }
+
+  List<Party> _parties = [];
 
   /// Getter method for [_parties]
   /// Pass in [context] to get vendors or customers depending on the type of Invoice screen (Purchase / Sales) user is in.

@@ -1,37 +1,56 @@
 import 'package:inventory/core/models/product.dart';
+import 'package:inventory/features/invoice/data/invoice_item.dart';
+import 'package:inventory/services/stock_service.dart';
 
 class Stock {
   Stock({
+    final int? id,
     required Product product,
-    required int stockQuantity,
+    // Length in meters (for roll) or Unit quantity (for box)
+    required int stockMeasure,
     required DateTime? lastCheckDate,
     required double inventoryValue,
   }) {
+    if (id != null) _id = id;
     _product = product;
-    _stockQuantity = stockQuantity;
+    _stockMeasure = stockMeasure;
     _lastCheckDate = lastCheckDate;
     _inventoryValue = inventoryValue;
   }
 
   factory Stock.fromJson(Map<String, dynamic> json) {
+    late final double inventoryValue;
+
+    try {
+      inventoryValue = json["value"] as double;
+    } catch (e) {
+      inventoryValue = (json["value"] as int).toDouble();
+    }
+
     return Stock(
-      product: Product.fromJson(
-          json['product']), // Assuming Product has fromJson constructor
-      stockQuantity: json['stockQuantity'] as int,
+      id: json["id"],
+      product: Product.fromJson(json['product']),
+      stockMeasure: json['measure'] as int,
       lastCheckDate: json['lastCheckDate'] != null
           ? DateTime.parse(json['lastCheckDate'])
           : null,
-      inventoryValue: json['inventoryValue'] as double,
+      inventoryValue: inventoryValue,
     );
+  }
+
+  late int _id;
+
+  int get id {
+    throw UnimplementedError("didn't decide how the stock id works yet");
   }
 
   late Product _product;
   Product get product => _product;
 
-  late int _stockQuantity;
-  int get stockQuantity => _stockQuantity;
-  set stockQuantity(int newStockQuantity) {
-    _stockQuantity = newStockQuantity;
+  late int _stockMeasure;
+  int get stockMeasure => _stockMeasure;
+  set stockMeasure(int newStockMeasure) {
+    _stockMeasure = newStockMeasure;
     // TODO: Update the stock quantity on the database table
   }
 
@@ -45,12 +64,24 @@ class Stock {
     // TODO: Update the product's inventory value on the database table
   }
 
-  Map<String, dynamic> toMap() {
+  // TODO: update this with respect to how the backend database functions
+  Map<String, dynamic> toJson() {
     return {
-      'productId': _product.id,
-      'stockQuantity': _stockQuantity,
-      'lastCheckDate': _lastCheckDate?.toIso8601String(),
-      'inventoryValue': _inventoryValue,
+      'product': product.toJson(),
+      // Stock Quantity
+      'measure': _stockMeasure,
+      // Inventory Value $
+      'value': _inventoryValue,
     };
+  }
+
+  // DATABASE INTEGRATION
+
+  Future<void> update() async {
+    await StockService.updateStock(_product.id, toJson());
+  }
+
+  static Future<void> updateWithStockItem(InvoiceItem item) async {
+    await StockService.updateStock(item.id, item.toJson());
   }
 }

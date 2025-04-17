@@ -22,10 +22,12 @@ class InvoiceDelivery {
     )..dueDate = json['dueDate'] as String? ?? ""; // Set dueDate if provided
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'status': status,
-      'dueDate': dueDate,
-    };
+  Map<String, dynamic>? toJson() {
+    return status.trim().isEmpty && dueDate.isEmpty
+        ? null
+        : {
+            'status': status,
+            'dueDate': dueDate,
+          };
   }
 }

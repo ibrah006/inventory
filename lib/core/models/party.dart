@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:inventory/presentation/providers/party_provider.dart';
+import 'package:inventory/services/party_service.dart';
 import 'package:provider/provider.dart';
 
 // party is either vendor or customer
@@ -20,23 +21,34 @@ final Map<PartyValidationFeedback, String> _errorMessages = {
 };
 
 class Party {
-  Party({required this.name, required this.id, required this.type});
+  // Constructors
+
+  Party(
+      {required this.name,
+      required this.id,
+      required this.type,
+      this.location});
 
   Party.fromId({required this.id, required this.type}) {
     // TODO: Get name from database. Either from Vendor table or Customer table depending on th runtimeType
   }
 
-  Party.vendor({
-    required String? name,
-    required this.id,
-  })  : type = PartyType.vendor,
+  Party.vendor(
+      {required String? name, required this.id, required this.location})
+      : type = PartyType.vendor,
         name = name ?? getPartyName(id);
 
-  Party.customer({
-    required String? name,
-    required this.id,
-  })  : type = PartyType.customer,
+  Party.customer(
+      {required String? name, required this.id, required this.location})
+      : type = PartyType.customer,
         name = name ?? getPartyName(id);
+
+  Party.copy(Party other) {
+    // Vendor(context, id: id);
+    name = other.name;
+    id = other.id;
+    type = other.type;
+  }
 
   // Factory constructor from JSON
   factory Party.fromJson(Map<String, dynamic> json) {
@@ -48,8 +60,11 @@ class Party {
       name: json['name'] as String,
       id: json['id'] as String,
       type: partyType,
+      location: json['location'],
     );
   }
+
+  // Attributes
 
   late String id;
 
@@ -57,22 +72,14 @@ class Party {
 
   late PartyType type;
 
-  static String getPartyName(String id) {
-    // TODO: get party name from database
-    throw UnimplementedError();
-  }
+  String? location;
+
+  // Methods
 
   bool get _isVendor => type == PartyType.vendor;
 
   PartyProvider _getPartyProvider(BuildContext context) =>
       context.read<PartyProvider>();
-
-  Party.copy(Party other) {
-    // Vendor(context, id: id);
-    name = other.name;
-    id = other.id;
-    type = other.type;
-  }
 
   // Party.fromJson(Map json) {
   //   // return Vendor(context, id: id);
@@ -83,12 +90,26 @@ class Party {
     id = "";
   }
 
+  // Convert the Party instance to JSON format
   Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "name": name,
-      "type": type.name, // Convert enum to string
-    };
+    return {"id": id, "name": name, "type": type.name, "location": location};
+  }
+
+  // Static Methods
+
+  static String getPartyName(String id) {
+    // TODO: get party name from database
+    throw UnimplementedError();
+  }
+
+  // DATABASE INTEGRATION
+
+  Future<void> insert() async {
+    try {
+      await PartyService.createVendor(toJson());
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 }
 
@@ -161,7 +182,8 @@ class FutureParty extends Party {
   /// Be sure to set State after the calling of this function
   /// Sets the variable [errorMessage] to something if there's an error in validating the ID textfield. othereise it will remain null
   /// remove the context inoput input after implementing database. so instead of checking the vendors from providers, chek from database tables directly
-  void validateIdTextField(BuildContext context, {bool isNewVendor = true}) {
+  Future<void> validateIdTextField(BuildContext context,
+      {bool isNewVendor = true}) async {
     print("validateIdTextField function called: $id, $name");
 
     id = id.trim();
@@ -181,7 +203,9 @@ class FutureParty extends Party {
 
         // update and notify party provider about the added party
         _updatePartyProvider(context);
-        // TODO: update the database table party
+
+        // Update the database table party
+        await super.insert();
 
         // Set showIdTextBox = false to because the entered input by user is valid
         showIdTextBox = false;

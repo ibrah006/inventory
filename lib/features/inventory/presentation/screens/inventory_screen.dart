@@ -1,8 +1,13 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' show Icons;
 import 'package:inventory/config/routes.dart';
 import 'package:inventory/core/constants/in_out_icons.dart';
+import 'package:inventory/core/providers/product_provider.dart';
 import 'package:inventory/features/inventory/data/samples.dart';
 import 'package:inventory/core/providers/stock_provider.dart';
+import 'package:inventory/features/inventory/presentation/widgets/products_lookup_search_bar.dart';
+import 'package:inventory/features/inventory/presentation/widgets/dashboard_stats_section.dart';
+import 'package:inventory/features/inventory/presentation/widgets/sales_overview_chart.dart';
 import 'package:inventory/presentation/providers/party_provider.dart';
 import 'package:inventory/presentation/widgets/tables/stock_table.dart';
 import 'package:provider/provider.dart';
@@ -28,8 +33,6 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("vendors: ${context.read<PartyProvider>().parties}");
-
     return ScaffoldPage(
       header: PageHeader(
         title: Text('Inventory Dashboard',
@@ -50,7 +53,7 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                 onPressed: () {
                   Navigator.pushNamed(context, AppRoutes.purchaseInvoice);
                 }),
-            SizedBox(width: 7),
+            SizedBox(width: 10),
             FilledButton(
                 child: Row(
                   children: [
@@ -65,188 +68,229 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
           ],
         ),
       ),
-      content: Row(
-        children: [
-          // Container(
-          //   width: 280,
-          //   margin: EdgeInsets.only(right: 15, top: 15),
-          //   height: MediaQuery.of(context).size.height,
-          //   color: Colors.white,
-          //   child: Column(
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     children: [
-          //       const SizedBox(height: 16),
-          //       // Home Item
-          //       _buildNavItem(
-          //         icon: FluentIcons.home_solid,
-          //         label: 'Home',
-          //         index: 0,
-          //       ),
-          //       _buildNavItem(
-          //         icon: FluentIcons.check_list,
-          //         label: 'My work',
-          //         index: 1,
-          //       ),
-          //       _divider,
-          //       _buildNavItem(
-          //           icon: FluentIcons.starburst,
-          //           label: 'Favorites',
-          //           index: 2,
-          //           isExpandable: true),
-          //       _divider,
-          //       // _buildSectionHeader('Favorites'),
-          //       Expander(
-          //           // trailing: Icon(FluentIcons.chevron_down),
-          //           // shape: RoundedRectangleBorder(side: BorderSide.none),
-          //           header: const Text(
-          //             'Workspaces',
-          //             style:
-          //                 TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-          //           ),
-          //           leading: Icon(FluentIcons.view_dashboard,
-          //               color: Colors.grey[170], size: 18),
-          //           content: Column(
-          //             children: [
-          //               _buildNavItem(
-          //                 icon: FluentIcons.home,
-          //                 label: 'Main workspace',
-          //                 index: 2,
-          //                 hasIndicator: true,
-          //               ),
-          //               _buildNavItem(
-          //                 icon: FluentIcons.folder_fill,
-          //                 label: 'First Project',
-          //                 index: 3,
-          //               ),
-          //               _buildNavItem(
-          //                 icon: FluentIcons.bar_chart_vertical,
-          //                 label: 'Dashboard and reporting',
-          //                 index: 4,
-          //               ),
-          //             ],
-          //           )),
-          //       _divider,
-          //       // Add Workspace Button
-          //       Row(
-          //         children: [
-          //           Flexible(
-          //             child: Button(
-          //               onPressed: () {},
-          //               style: ButtonStyle(
-          //                   shape: WidgetStatePropertyAll(
-          //                       RoundedRectangleBorder(side: BorderSide.none))),
-          //               child: Row(
-          //                 mainAxisSize: MainAxisSize.min,
-          //                 children: [
-          //                   const Icon(FluentIcons.add),
-          //                   SizedBox(width: 5.0),
-          //                   const Text('Add workspace'),
-          //                 ],
-          //               ),
-          //             ),
-          //           ),
-          //           Button(
-          //             onPressed: () {},
-          //             style: ButtonStyle(
-          //                 shape: WidgetStatePropertyAll(
-          //                     RoundedRectangleBorder(side: BorderSide.none))),
-          //             child: Row(
-          //               mainAxisSize: MainAxisSize.min,
-          //               children: [
-          //                 const Icon(FluentIcons.go_to_dashboard),
-          //                 SizedBox(width: 5.0),
-          //                 const Text('Browse all'),
-          //               ],
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Left Panel: Add Inventory and Transfer
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Button(
-                              child: Text('Add Inventory'),
-                              onPressed: gotoAddScreen,
-                              style: ButtonStyle(
-                                padding: ButtonState.all(
-                                    const EdgeInsets.symmetric(
-                                        vertical: 12, horizontal: 20)),
-                              ),
-                            ),
-                            SizedBox(height: 16),
-                            Button(
-                              child: Text('Transfer Inventory Item'),
-                              onPressed: () {
-                                // Action to transfer inventory
-                              },
-                              style: ButtonStyle(
-                                padding: ButtonState.all(
-                                    const EdgeInsets.symmetric(
-                                        vertical: 12, horizontal: 20)),
-                              ),
-                            ),
-                            SizedBox(height: 32),
-                            Text(
-                              'Dashboard Statistics',
-                              style:
-                                  FluentTheme.of(context).typography.subtitle,
-                            ),
-                            SizedBox(height: 8),
-                            // Statistics Tiles
-                            Wrap(
-                              spacing: 16,
-                              runSpacing: 16,
-                              children: [
-                                _buildStatTile(context, 'Total Items', '150'),
-                                _buildStatTile(
-                                    context, 'Items Out Today', '10'),
-                                _buildStatTile(
-                                    context, 'Items Added Today', '20'),
-                              ],
-                            ),
-                          ],
-                        ),
+      content: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Button(
+                      onPressed: gotoAddScreen,
+                      style: ButtonStyle(
+                        padding: ButtonState.all(const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 16)),
                       ),
-                      SizedBox(width: 16),
-                      // Right Panel: Inventory Table
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Inventory Overview',
-                              style:
-                                  FluentTheme.of(context).typography.subtitle,
-                            ),
-                            SizedBox(height: 15),
-                            // Stock table
-                            SizedBox(height: 315, child: StockTable())
-                          ],
-                        ),
+                      child: Row(
+                        children: [
+                          Stack(
+                            children: [
+                              Icon(
+                                FluentIcons.cube_shape_solid,
+                                size: 18.5,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 10, top: 10),
+                                child: Icon(
+                                  Icons.add_circle,
+                                  size: 13,
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(width: 10),
+                          Text('Add Inventory'),
+                        ],
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 30),
-                ],
-              ),
+                    ),
+                    SizedBox(height: 5),
+                    Button(
+                      onPressed: () {
+                        // Action to transfer inventory
+                      },
+                      style: ButtonStyle(
+                        padding: ButtonState.all(const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 16)),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.black, // Filled background
+                            ),
+                            padding: EdgeInsets.all(5),
+                            child: Icon(
+                              FluentIcons.database_swap,
+                              color: Colors.white,
+                              size: 13,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text('Transfer Inventory Item'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                LookupSearchBar(),
+              ],
             ),
-          ),
-        ],
+            SizedBox(height: 20),
+            Row(
+              children: [
+                // Container(
+                //   width: 280,
+                //   margin: EdgeInsets.only(right: 15, top: 15),
+                //   height: MediaQuery.of(context).size.height,
+                //   color: Colors.white,
+                //   child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       const SizedBox(height: 16),
+                //       // Home Item
+                //       _buildNavItem(
+                //         icon: FluentIcons.home_solid,
+                //         label: 'Home',
+                //         index: 0,
+                //       ),
+                //       _buildNavItem(
+                //         icon: FluentIcons.check_list,
+                //         label: 'My work',
+                //         index: 1,
+                //       ),
+                //       _divider,
+                //       _buildNavItem(
+                //           icon: FluentIcons.starburst,
+                //           label: 'Favorites',
+                //           index: 2,
+                //           isExpandable: true),
+                //       _divider,
+                //       // _buildSectionHeader('Favorites'),
+                //       Expander(
+                //           // trailing: Icon(FluentIcons.chevron_down),
+                //           // shape: RoundedRectangleBorder(side: BorderSide.none),
+                //           header: const Text(
+                //             'Workspaces',
+                //             style:
+                //                 TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+                //           ),
+                //           leading: Icon(FluentIcons.view_dashboard,
+                //               color: Colors.grey[170], size: 18),
+                //           content: Column(
+                //             children: [
+                //               _buildNavItem(
+                //                 icon: FluentIcons.home,
+                //                 label: 'Main workspace',
+                //                 index: 2,
+                //                 hasIndicator: true,
+                //               ),
+                //               _buildNavItem(
+                //                 icon: FluentIcons.folder_fill,
+                //                 label: 'First Project',
+                //                 index: 3,
+                //               ),
+                //               _buildNavItem(
+                //                 icon: FluentIcons.bar_chart_vertical,
+                //                 label: 'Dashboard and reporting',
+                //                 index: 4,
+                //               ),
+                //             ],
+                //           )),
+                //       _divider,
+                //       // Add Workspace Button
+                //       Row(
+                //         children: [
+                //           Flexible(
+                //             child: Button(
+                //               onPressed: () {},
+                //               style: ButtonStyle(
+                //                   shape: WidgetStatePropertyAll(
+                //                       RoundedRectangleBorder(side: BorderSide.none))),
+                //               child: Row(
+                //                 mainAxisSize: MainAxisSize.min,
+                //                 children: [
+                //                   const Icon(FluentIcons.add),
+                //                   SizedBox(width: 5.0),
+                //                   const Text('Add workspace'),
+                //                 ],
+                //               ),
+                //             ),
+                //           ),
+                //           Button(
+                //             onPressed: () {},
+                //             style: ButtonStyle(
+                //                 shape: WidgetStatePropertyAll(
+                //                     RoundedRectangleBorder(side: BorderSide.none))),
+                //             child: Row(
+                //               mainAxisSize: MainAxisSize.min,
+                //               children: [
+                //                 const Icon(FluentIcons.go_to_dashboard),
+                //                 SizedBox(width: 5.0),
+                //                 const Text('Browse all'),
+                //               ],
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Left Panel: Add Inventory and Transfer
+                            Expanded(
+                              flex: 2,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Statistics Tiles
+                                  DashboardStatsSection(),
+                                  SizedBox(height: 25),
+                                  SalesOverviewChart(),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            // Right Panel: Inventory Table
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Inventory Overview',
+                                    style: FluentTheme.of(context)
+                                        .typography
+                                        .subtitle,
+                                  ),
+                                  SizedBox(height: 15),
+                                  // Stock table
+                                  SizedBox(height: 315, child: StockTable())
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 30),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -300,7 +344,16 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
 
     if (mounted) {
       Provider.of<StockProvider>(context, listen: false)
-          .intializeStock(Samples.generate());
+          .intializeStock(Samples.sampleStock);
+      Provider.of<ProductProvider>(context, listen: false)
+          .initializeProducts(Samples.sampleProducts);
+
+      // Load Parties (Vendors/Customers)
+      Provider.of<PartyProvider>(context, listen: false)
+          .initialize()
+          .then((value) {
+        print("loaded parties successfully");
+      });
     }
   }
 

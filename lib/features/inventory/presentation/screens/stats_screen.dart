@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:inventory/features/inventory/presentation/widgets/date_input_box.dart';
+import 'package:inventory/features/invoice/presentation/widgets/reusable_card.dart';
 
 class StatsScreen extends StatelessWidget {
   final TextEditingController dateController = TextEditingController();
@@ -102,12 +103,9 @@ class StatsScreen extends StatelessWidget {
 
   Widget _buildStatisticsCard(BuildContext context,
       {required String title, required Map<String, String> data}) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.withAlpha(75)),
-        borderRadius: BorderRadius.circular(8),
-      ),
+    return ReusableCard(
+      disableShadow: true,
+      // color: ,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
