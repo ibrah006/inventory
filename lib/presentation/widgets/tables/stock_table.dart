@@ -74,8 +74,6 @@ class _StockTableState extends State<StockTable> {
           children: [
             // Inventory Table
             LayoutBuilder(builder: (context, constraints) {
-              print("table max width: ${constraints.maxWidth}");
-
               final checkboxFlex = constraints.maxWidth > 488
                   ? (constraints.maxWidth / 646.67) / 2
                   : (constraints.maxWidth / 646.67) * 1.15;

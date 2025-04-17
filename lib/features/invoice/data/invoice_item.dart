@@ -263,7 +263,7 @@ class InvoiceItem extends Product {
 
     return RowInfo(rowCells: [
       itemDesc,
-      measure.toString(),
+      "${measure.toString()}${isMeasureInStockingUnit ? ' $stockingUnit(s)' : ""}",
       cost.toStringAsFixed(2),
       amount.toStringAsFixed(2)
     ]);
