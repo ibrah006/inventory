@@ -59,7 +59,7 @@ A modern inventory management application built using **Flutter**, tailored prim
 
 | Dashboard 📊 | Transfer Inventory 🔄 |
 |--------------|----------------------|
-| ![Dashboard](assets/screenshots/dashboard.png) | ![Transfer](assets/screenshots/transfer_inventory.png) |
+| ![Dashboard](assets/screenshots/dashboard.png) | ![Transfer](assets/screenshots/purchase_invoice.png) |
 
 ---
 
