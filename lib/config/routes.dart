@@ -5,7 +5,8 @@ import 'package:inventory/core/models/product.dart';
 import 'package:inventory/features/inventory/presentation/screens/add_inventory_screen.dart';
 import 'package:inventory/features/inventory/presentation/screens/inventory_screen.dart';
 import 'package:inventory/features/inventory/presentation/screens/products_lookup_results_screen.dart';
-import 'package:inventory/features/invoice/data/invoice_item.dart';
+import 'package:inventory/features/inventory/presentation/screens/transfer_inventory_screen.dart';
+
 import 'package:inventory/features/invoice/presentation/screens/invoice_screen.dart';
 
 class AppRoutes {
@@ -17,6 +18,8 @@ class AppRoutes {
   static const String salesInvoice = "/invoice/sales";
   // stock endpoint
   static const String stock = "/stock";
+
+  static const String transferInventory = "/transfer";
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     return MaterialPageRoute(builder: (_) {
@@ -35,6 +38,8 @@ class AppRoutes {
 
             return ProductsLookupResultsScreen(results: args);
           }
+        case transferInventory:
+          return TransferInventoryScreen();
         default:
           return Placeholder();
       }

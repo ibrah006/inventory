@@ -19,13 +19,15 @@ class InvoiceItem extends Product {
       String? name,
       int? measure,
       double? cost,
-      double? amount})
+      double? amount,
+      Product? product})
       : super.empty() {
     // this.itemDesc = itemDesc ?? this.itemDesc;
 
     this.measure = measure ?? this.measure;
     this.cost = cost ?? this.cost;
     this.amount = amount ?? this.amount;
+    if (product != null) setSelf(product);
   }
 
   factory InvoiceItem.fromJson(Map<String, dynamic> json) {

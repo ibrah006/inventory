@@ -112,6 +112,8 @@ class _InventoryDashboardScreenState extends State<InventoryDashboardScreen> {
                     Button(
                       onPressed: () {
                         // Action to transfer inventory
+                        Navigator.pushNamed(
+                            context, AppRoutes.transferInventory);
                       },
                       style: ButtonStyle(
                         padding: ButtonState.all(const EdgeInsets.symmetric(

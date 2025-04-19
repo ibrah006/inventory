@@ -12,6 +12,7 @@ void main() async {
   // Generate sample data
   // await Samples.generate();
   await Samples.initializeSamples();
+  // await Samples.generateSampleInvoices();
 
   runApp(const MyApp());
 }

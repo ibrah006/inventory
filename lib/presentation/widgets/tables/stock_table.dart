@@ -154,7 +154,7 @@ class _StockTableState extends State<StockTable> {
                   : SingleChildScrollView(
                       child: LayoutBuilder(builder: (context, constraints) {
                         final maxWidth = constraints.maxWidth;
-                        print("table max width: ${maxWidth}");
+                        // print("table max width: ${maxWidth}");
 
                         double getExponent() {
                           if (maxWidth < 540) return 1.0;

@@ -64,12 +64,36 @@ class Invoice {
   ///
   List<InvoiceItem> items = [];
 
-  factory Invoice.purchase() {
-    return Invoice(type: InvoiceType.purchase);
+  factory Invoice.purchase(
+      {Party? party,
+      String? issueDate,
+      List<InvoiceItem>? items,
+      double? subTotal,
+      String? notes}) {
+    return Invoice(
+      party: party,
+      issueDate: issueDate,
+      type: InvoiceType.purchase,
+    )
+      ..items = items ?? []
+      ..subTotal = subTotal ?? 0
+      ..notes = notes ?? "";
   }
 
-  factory Invoice.sales() {
-    return Invoice(type: InvoiceType.sales);
+  factory Invoice.sales(
+      {Party? party,
+      String? issueDate,
+      List<InvoiceItem>? items,
+      double? subTotal,
+      String? notes}) {
+    return Invoice(
+      party: party,
+      type: InvoiceType.sales,
+      issueDate: issueDate,
+    )
+      ..items = items ?? []
+      ..subTotal = subTotal ?? 0
+      ..notes = notes ?? "";
   }
 
   Invoice(
